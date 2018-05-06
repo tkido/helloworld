@@ -23,20 +23,24 @@ func main() {
 		log.Fatal(err)
 	}
 	defer s.Fini()
-	defStyle = tcell.StyleDefault.
-		Background(tcell.ColorBlack).
-		Foreground(tcell.ColorWhite)
+	defStyle = tcell.StyleDefault.Background(tcell.ColorBlack).Foreground(tcell.ColorWhite)
 	s.SetStyle(defStyle)
 	s.EnableMouse()
 	s.Clear()
 
 	w, h := s.Size()
-	white := tcell.StyleDefault.
-		Foreground(tcell.ColorWhite)
+	white := tcell.StyleDefault.Foreground(tcell.ColorWhite)
+	red := tcell.StyleDefault.Foreground(tcell.ColorBlue).Background(tcell.ColorRed)
+
 	w, h = s.Size()
 	emitStr(s, 0, 0, white, fmt.Sprint(w))
 	emitStr(s, 0, 1, white, fmt.Sprint(h))
 	puts(s, white, 0, 2, "テストですよ")
+	puts(s, white, 1, 3, "テストですよ")
+	puts(s, red, 0, 4, "◆")
+	puts(s, red, 0, 5, "◆◆")
+	puts(s, red, 0, 6, "◆◆◆")
+	puts(s, red, 0, 7, "◆◆◆◆")
 	s.Show()
 
 MAINLOOP:
