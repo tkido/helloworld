@@ -1,36 +1,40 @@
 package main
 
 import (
-	"fmt"
+	"log"
 	"os"
 
 	"bitbucket.org/tkido/helloworld/core/godfather"
-	"github.com/gdamore/tcell"
+	tc "github.com/gdamore/tcell"
 	"github.com/gdamore/tcell/encoding"
 	"github.com/mattn/go-runewidth"
 )
 
 var row = 0
-var style = tcell.StyleDefault
+var style = tc.StyleDefault
 
 func main() {
-	s, e := tcell.NewScreen()
-	if e != nil {
-		fmt.Fprintf(os.Stderr, "%v\n", e)
-		os.Exit(1)
+	logf, err := os.OpenFile("debug.log", os.O_WRONLY|os.O_CREATE|os.O_APPEND, 0666)
+	if err != nil {
+		log.Fatal(err)
 	}
+	defer logf.Close()
+	log.SetOutput(logf)
 
+	s, err := tc.NewScreen()
+	if err != nil {
+		log.Fatalln(err)
+	}
 	encoding.Register()
-
-	if e = s.Init(); e != nil {
-		fmt.Fprintf(os.Stderr, "%v\n", e)
-		os.Exit(1)
+	if err = s.Init(); err != nil {
+		log.Fatalln(err)
 	}
+	defer s.Fini()
 
-	plain := tcell.StyleDefault
+	plain := tc.StyleDefault
 	bold := style.Bold(true)
 
-	s.SetStyle(tcell.StyleDefault.Foreground(tcell.ColorWhite).Background(tcell.ColorBlack))
+	s.SetStyle(tc.StyleDefault.Foreground(tc.ColorWhite).Background(tc.ColorBlack))
 	s.Clear()
 
 	quit := make(chan struct{})
@@ -38,28 +42,28 @@ func main() {
 	style = bold
 	putln(s, "日本語表示のテスト"+s.CharacterSet())
 	style = plain
-
 	s.Show()
+
 	go func() {
 		for {
 			ev := s.PollEvent()
 			switch ev := ev.(type) {
-			case *tcell.EventKey:
+			case *tc.EventKey:
 				switch ev.Key() {
-				case tcell.KeyEnter:
+				case tc.KeyEnter:
 					s.Clear()
 					row = 1
 					for i := 0; i < 10; i++ {
 						putln(s, godfather.Next())
 					}
-					s.Sync()
-				case tcell.KeyEscape:
+					s.Show()
+				case tc.KeyEscape:
 					close(quit)
 					return
-				case tcell.KeyCtrlL:
+				case tc.KeyCtrlL:
 					s.Sync()
 				}
-			case *tcell.EventResize:
+			case *tc.EventResize:
 				s.Sync()
 			}
 		}
@@ -67,15 +71,14 @@ func main() {
 
 	<-quit
 
-	s.Fini()
 }
 
-func putln(s tcell.Screen, str string) {
+func putln(s tc.Screen, str string) {
 	puts(s, style, 1, row, str)
 	row++
 }
 
-func puts(s tcell.Screen, style tcell.Style, x, y int, str string) {
+func puts(s tc.Screen, style tc.Style, x, y int, str string) {
 	i := 0
 	var deferred []rune
 	dwidth := 0
