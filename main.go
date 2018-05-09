@@ -4,11 +4,38 @@ import (
 	"log"
 	"os"
 
+	"github.com/gdamore/tcell"
+
 	"bitbucket.org/tkido/helloworld/core/godfather"
 	tc "github.com/gdamore/tcell"
 	"github.com/gdamore/tcell/encoding"
-	"github.com/mattn/go-runewidth"
+	rw "github.com/mattn/go-runewidth"
 )
+
+// Rect is Rectangle keeps x-position, y-position and size width, height
+type Rect struct {
+	X, Y, W, H int
+}
+
+// Label is single line text
+type Label struct {
+	s     tc.Screen
+	Text  string
+	Style tc.Style
+	Rect
+}
+
+// Draw draws this Label
+func (l *Label) Draw() {
+	str := l.Text
+	w := rw.StringWidth(l.Text)
+	if w < l.W {
+		str = rw.FillRight(str, l.W)
+	} else if w > l.W {
+		str = rw.Truncate(str, l.W, "")
+	}
+	puts(l.s, l.Style, l.X, l.Y, str)
+}
 
 var row = 0
 var style = tc.StyleDefault
@@ -33,8 +60,10 @@ func main() {
 
 	plain := tc.StyleDefault
 	bold := style.Bold(true)
+	em := tc.StyleDefault.Foreground(tc.ColorRed).Background(tc.ColorDarkBlue)
 
 	s.SetStyle(tc.StyleDefault.Foreground(tc.ColorWhite).Background(tc.ColorBlack))
+	s.EnableMouse()
 	s.Clear()
 
 	quit := make(chan struct{})
@@ -49,6 +78,7 @@ func main() {
 			ev := s.PollEvent()
 			switch ev := ev.(type) {
 			case *tc.EventKey:
+				log.Println(ev.Key())
 				switch ev.Key() {
 				case tc.KeyEnter:
 					s.Clear()
@@ -62,6 +92,32 @@ func main() {
 					return
 				case tc.KeyCtrlL:
 					s.Sync()
+				case tc.KeyRune:
+					switch ev.Rune() {
+					case 'A', 'a':
+						label := Label{
+							s,
+							"ラベルのテスト",
+							em,
+							Rect{10, 10, 20, 1},
+						}
+						label.Draw()
+						label2 := Label{
+							s,
+							"ラベルのテストラベルのテスト",
+							em,
+							Rect{10, 11, 20, 1},
+						}
+						label2.Draw()
+						s.Sync()
+					}
+				}
+			case *tc.EventMouse:
+				x, y := ev.Position()
+				switch ev.Buttons() {
+				case tcell.Button1:
+					s.SetContent(x, y, ' ', []rune{}, style.Reverse(true))
+					s.Show()
 				}
 			case *tc.EventResize:
 				s.Sync()
@@ -83,7 +139,7 @@ func puts(s tc.Screen, style tc.Style, x, y int, str string) {
 	var deferred []rune
 	dwidth := 0
 	for _, r := range str {
-		switch runewidth.RuneWidth(r) {
+		switch rw.RuneWidth(r) {
 		case 0:
 			if len(deferred) == 0 {
 				deferred = append(deferred, ' ')
