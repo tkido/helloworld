@@ -14,11 +14,11 @@ import (
 )
 
 const (
-	screenWidth  = 640 * 2
-	screenHeight = 480 * 2
+	screenWidth  = 640
+	screenHeight = 480
 	blockSize    = 8
 	dead         = 0
-	live         = 1 << 4
+	live         = 9
 )
 
 var (
@@ -60,12 +60,14 @@ func init() {
 	for y := range board {
 		board[y] = make([]int, w, w)
 		for x := range board[y] {
-			board[y][x] = rand.Intn(2) * live
+			if rand.Float64() < 0.3 {
+				board[y][x] = live
+			}
 		}
 	}
 }
 
-func update(screen *ebiten.Image) error {
+func update() error {
 	for y := range board {
 		for x, c := range board[y] {
 			if c < live {
@@ -83,23 +85,22 @@ func update(screen *ebiten.Image) error {
 			switch c {
 			case 3:
 				board[y][x] = live
-			case 17, 18, 21, 22, 23, 24, 25:
+			case 10, 11, 14, 15, 16, 17, 18:
 				board[y][x] = dead
 			default:
 				board[y][x] = c / live * live
 			}
 		}
 	}
+	return nil
+}
 
-	if ebiten.IsRunningSlowly() {
-		return nil
-	}
-
+func draw(screen *ebiten.Image) (err error) {
 	for y := range board {
 		for x, c := range board[y] {
 			opts := &ebiten.DrawImageOptions{}
 			opts.GeoM.Translate(float64(x)*blockSize, float64(y)*blockSize)
-			opts.SourceRect = srcRects[c>>4]
+			opts.SourceRect = srcRects[c/live]
 			screen.DrawImage(imgSrc, opts)
 		}
 	}
@@ -107,11 +108,28 @@ func update(screen *ebiten.Image) error {
 	msg := fmt.Sprintf(`FPS: %0.2f`, ebiten.CurrentFPS())
 	ebitenutil.DebugPrint(screen, msg)
 
-	return nil
+	return
+}
+
+func updateScreen(screen *ebiten.Image) (err error) {
+	err = update()
+	if err != nil {
+		return
+	}
+
+	if ebiten.IsRunningSlowly() {
+		return
+	}
+
+	err = draw(screen)
+	if err != nil {
+		return
+	}
+	return
 }
 
 func main() {
-	if err := ebiten.Run(update, screenWidth, screenHeight, 1, "Life (Ebiten Demo)"); err != nil {
+	if err := ebiten.Run(updateScreen, screenWidth, screenHeight, 1, "Life (Ebiten Demo)"); err != nil {
 		log.Fatal(err)
 	}
 }
