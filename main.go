@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"image"
 	_ "image/png"
 	"log"
@@ -9,11 +10,12 @@ import (
 	"math/rand"
 
 	"github.com/hajimehoshi/ebiten"
+	"github.com/hajimehoshi/ebiten/ebitenutil"
 )
 
 const (
-	screenWidth  = 640
-	screenHeight = 480
+	screenWidth  = 640 * 2
+	screenHeight = 480 * 2
 	blockSize    = 8
 	dead         = 0
 	live         = 1 << 4
@@ -33,7 +35,7 @@ const (
 
 func init() {
 	rand.Seed(time.Now().UnixNano())
-	// イメージソースの準備
+
 	f, err := Assets.Open("/assets/block00.png")
 	if err != nil {
 		log.Fatal(err)
@@ -61,9 +63,6 @@ func init() {
 }
 
 func update(screen *ebiten.Image) error {
-	if ebiten.IsRunningSlowly() {
-		return nil
-	}
 	for i, c := range board {
 		if c < live {
 			continue
@@ -84,11 +83,22 @@ func update(screen *ebiten.Image) error {
 		default:
 			board[i] = c / live * live
 		}
+	}
+
+	if ebiten.IsRunningSlowly() {
+		return nil
+	}
+
+	for i := range board {
 		opts := &ebiten.DrawImageOptions{}
 		opts.GeoM.Translate(float64(i%w)*blockSize, float64(i/w)*blockSize)
 		opts.SourceRect = srcRects[board[i]>>4]
 		screen.DrawImage(imgSrc, opts)
 	}
+
+	msg := fmt.Sprintf(`FPS: %0.2f`, ebiten.CurrentFPS())
+	ebitenutil.DebugPrint(screen, msg)
+
 	return nil
 }
 
