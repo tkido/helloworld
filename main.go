@@ -23,7 +23,7 @@ var (
 	imgSrc   *ebiten.Image
 	srcRects []*image.Rectangle
 	board    []int
-	moores   []int
+	deltas   []int
 )
 
 const (
@@ -51,7 +51,9 @@ func init() {
 	deadRect := image.Rect(0, 0, blockSize, blockSize)
 	liveRect := image.Rect(blockSize, 0, blockSize*2, blockSize)
 	srcRects = []*image.Rectangle{&deadRect, &liveRect}
+
 	board = make([]int, w*h, w*h)
+	deltas = []int{-1, 0, 1}
 
 	for i := range board {
 		board[i] = rand.Intn(2) * live
@@ -59,23 +61,34 @@ func init() {
 }
 
 func update(screen *ebiten.Image) error {
-	// screen.Fill(color.NRGBA{0xff, 0x00, 0x00, 0xff})
 	if ebiten.IsRunningSlowly() {
 		return nil
 	}
-	for i := range board {
-		// if c == dead {
-		// 	continue
-		// }
-		board[i] = rand.Intn(2) * live
+	for i, c := range board {
+		if c < live {
+			continue
+		}
+		x, y := i%w, i/w
+		for _, dy := range deltas {
+			for _, dx := range deltas {
+				board[((y+dy+h)%h)*w+(x+dx+w)%w]++
+			}
+		}
 	}
 	for i, c := range board {
+		switch c {
+		case 3:
+			board[i] = live
+		case 17, 18, 21, 22, 23, 24, 25:
+			board[i] = dead
+		default:
+			board[i] = c / live * live
+		}
 		opts := &ebiten.DrawImageOptions{}
 		opts.GeoM.Translate(float64(i%w)*blockSize, float64(i/w)*blockSize)
-		opts.SourceRect = srcRects[c>>4]
+		opts.SourceRect = srcRects[board[i]>>4]
 		screen.DrawImage(imgSrc, opts)
 	}
-
 	return nil
 }
 
