@@ -24,7 +24,7 @@ const (
 var (
 	imgSrc   *ebiten.Image
 	srcRects []*image.Rectangle
-	board    []int
+	board    [][]int
 	deltas   []int
 )
 
@@ -54,34 +54,40 @@ func init() {
 	liveRect := image.Rect(blockSize, 0, blockSize*2, blockSize)
 	srcRects = []*image.Rectangle{&deadRect, &liveRect}
 
-	board = make([]int, w*h, w*h)
+	board = make([][]int, h, h)
 	deltas = []int{-1, 0, 1}
 
-	for i := range board {
-		board[i] = rand.Intn(2) * live
+	for y := range board {
+		board[y] = make([]int, w, w)
+		for x := range board[y] {
+			board[y][x] = rand.Intn(2) * live
+		}
 	}
 }
 
 func update(screen *ebiten.Image) error {
-	for i, c := range board {
-		if c < live {
-			continue
-		}
-		x, y := i%w, i/w
-		for _, dy := range deltas {
-			for _, dx := range deltas {
-				board[((y+dy+h)%h)*w+(x+dx+w)%w]++
+	for y := range board {
+		for x, c := range board[y] {
+			if c < live {
+				continue
+			}
+			for _, dy := range deltas {
+				for _, dx := range deltas {
+					board[(y+dy+h)%h][(x+dx+w)%w]++
+				}
 			}
 		}
 	}
-	for i, c := range board {
-		switch c {
-		case 3:
-			board[i] = live
-		case 17, 18, 21, 22, 23, 24, 25:
-			board[i] = dead
-		default:
-			board[i] = c / live * live
+	for y := range board {
+		for x, c := range board[y] {
+			switch c {
+			case 3:
+				board[y][x] = live
+			case 17, 18, 21, 22, 23, 24, 25:
+				board[y][x] = dead
+			default:
+				board[y][x] = c / live * live
+			}
 		}
 	}
 
@@ -89,11 +95,13 @@ func update(screen *ebiten.Image) error {
 		return nil
 	}
 
-	for i := range board {
-		opts := &ebiten.DrawImageOptions{}
-		opts.GeoM.Translate(float64(i%w)*blockSize, float64(i/w)*blockSize)
-		opts.SourceRect = srcRects[board[i]>>4]
-		screen.DrawImage(imgSrc, opts)
+	for y := range board {
+		for x, c := range board[y] {
+			opts := &ebiten.DrawImageOptions{}
+			opts.GeoM.Translate(float64(x)*blockSize, float64(y)*blockSize)
+			opts.SourceRect = srcRects[c>>4]
+			screen.DrawImage(imgSrc, opts)
+		}
 	}
 
 	msg := fmt.Sprintf(`FPS: %0.2f`, ebiten.CurrentFPS())
