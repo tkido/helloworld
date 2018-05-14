@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"image/color"
+	"io/ioutil"
 	"log"
 	"math/rand"
 	"strings"
@@ -141,6 +142,15 @@ func update(screen *ebiten.Image) error {
 }
 
 func main() {
+	f, err := Assets.Open("/assets/test.txt")
+	if err != nil {
+		log.Fatal(err)
+	}
+	d, err := ioutil.ReadAll(f)
+	if err != nil {
+		log.Fatal(err)
+	}
+	fmt.Println(string(d))
 	if err := ebiten.Run(update, screenWidth, screenHeight, 1, "Font (Ebiten Demo)"); err != nil {
 		log.Fatal(err)
 	}

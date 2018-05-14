@@ -2,27 +2,31 @@
 GOCMD=go
 GOBUILD=$(GOCMD) build
 GOCLEAN=$(GOCMD) clean
-GOTEST=$(GOCMD) test
-GOGET=$(GOCMD) get
+GOTEST=$(GOCMD) test -v
+GOGET=$(GOCMD) get -u
 BINARY_NAME=mmm.exe
 BINARY_UNIX=$(BINARY_NAME)_unix
 
-all: test clean build
-build: 
+all: test clean asset build
+build:
 	$(GOBUILD) -o $(BINARY_NAME) -v
-test: 
-	$(GOTEST) -v .
-	$(GOTEST) -v ./core/godfather
+test:
+	$(GOTEST) .
+	$(GOTEST) ./core/godfather
 clean: 
 	$(GOCLEAN)
 	rm -f $(BINARY_NAME)
 	rm -f $(BINARY_UNIX)
 run:
-	$(GOBUILD) -o $(BINARY_NAME) -v main.go
+	$(GOBUILD) -o $(BINARY_NAME) -v
 	./$(BINARY_NAME)
+asset:
+	go-assets-builder -o=assets.go -p=main assets/
 deps:
 	$(GOGET) github.com/hajimehoshi/ebiten
 	$(GOGET) github.com/golang/freetype/truetype
+	$(GOGET) github.com/jessevdk/go-assets
+	$(GOGET) github.com/jessevdk/go-assets-builder
 	$(GOGET) golang.org/x/image/font
 
 # Cross compilation
