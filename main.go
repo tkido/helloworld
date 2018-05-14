@@ -24,9 +24,49 @@ const (
 var (
 	imgSrc   *ebiten.Image
 	srcRects []*image.Rectangle
-	board    [][]int
+	board    Board
 	deltas   []int
+	game     Game
 )
+
+// Game is status of game
+type Game struct {
+	IsRunning, IsDebugPrint bool
+}
+
+// Board in matrix of cell
+type Board [][]int
+
+// NewBoard get Board
+func NewBoard() Board {
+	b := make([][]int, h, h)
+	for y := range b {
+		b[y] = make([]int, w, w)
+	}
+	return b
+}
+
+// Clear all cells
+func (b Board) Clear() {
+	for y := range b {
+		for x := range b[y] {
+			b[y][x] = dead
+		}
+	}
+}
+
+// Rand randomize all cells
+func (b Board) Rand() {
+	for y := range b {
+		for x := range b[y] {
+			if rand.Float64() < 0.3 {
+				b[y][x] = live
+			} else {
+				b[y][x] = dead
+			}
+		}
+	}
+}
 
 const (
 	w = screenWidth / blockSize
@@ -53,18 +93,12 @@ func init() {
 	deadRect := image.Rect(0, 0, blockSize, blockSize)
 	liveRect := image.Rect(blockSize, 0, blockSize*2, blockSize)
 	srcRects = []*image.Rectangle{&deadRect, &liveRect}
-
-	board = make([][]int, h, h)
 	deltas = []int{-1, 0, 1}
 
-	for y := range board {
-		board[y] = make([]int, w, w)
-		for x := range board[y] {
-			if rand.Float64() < 0.3 {
-				board[y][x] = live
-			}
-		}
-	}
+	game = Game{false, false}
+	board = NewBoard()
+	board.Rand()
+
 }
 
 func update() error {
@@ -105,16 +139,30 @@ func draw(screen *ebiten.Image) (err error) {
 		}
 	}
 
-	msg := fmt.Sprintf(`FPS: %0.2f`, ebiten.CurrentFPS())
-	ebitenutil.DebugPrint(screen, msg)
+	if game.IsDebugPrint {
+		msg := fmt.Sprintf(`FPS: %0.2f`, ebiten.CurrentFPS())
+		ebitenutil.DebugPrint(screen, msg)
+	}
 
 	return
 }
 
-func updateScreen(screen *ebiten.Image) (err error) {
-	err = update()
-	if err != nil {
-		return
+func mainLoop(screen *ebiten.Image) (err error) {
+	if ebiten.IsKeyPressed(ebiten.KeySpace) {
+		game.IsRunning = !game.IsRunning
+	} else if ebiten.IsKeyPressed(ebiten.KeyC) {
+		board.Clear()
+		game.IsRunning = false
+	} else if ebiten.IsKeyPressed(ebiten.KeyR) {
+		board.Rand()
+		game.IsRunning = false
+	}
+
+	if game.IsRunning {
+		err = update()
+		if err != nil {
+			return
+		}
 	}
 
 	if ebiten.IsRunningSlowly() {
@@ -129,7 +177,7 @@ func updateScreen(screen *ebiten.Image) (err error) {
 }
 
 func main() {
-	if err := ebiten.Run(updateScreen, screenWidth, screenHeight, 1, "Life (Ebiten Demo)"); err != nil {
+	if err := ebiten.Run(mainLoop, screenWidth, screenHeight, 1, "Life (Ebiten Demo)"); err != nil {
 		log.Fatal(err)
 	}
 }
