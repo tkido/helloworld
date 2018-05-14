@@ -5,6 +5,7 @@ import (
 	"image"
 	_ "image/png"
 	"log"
+	"strings"
 	"time"
 
 	"math/rand"
@@ -32,40 +33,6 @@ var (
 // Game is status of game
 type Game struct {
 	IsRunning, IsDebugPrint bool
-}
-
-// Board in matrix of cell
-type Board [][]int
-
-// NewBoard get Board
-func NewBoard() Board {
-	b := make([][]int, h, h)
-	for y := range b {
-		b[y] = make([]int, w, w)
-	}
-	return b
-}
-
-// Clear all cells
-func (b Board) Clear() {
-	for y := range b {
-		for x := range b[y] {
-			b[y][x] = dead
-		}
-	}
-}
-
-// Rand randomize all cells
-func (b Board) Rand() {
-	for y := range b {
-		for x := range b[y] {
-			if rand.Float64() < 0.3 {
-				b[y][x] = live
-			} else {
-				b[y][x] = dead
-			}
-		}
-	}
 }
 
 const (
@@ -140,9 +107,46 @@ func draw(screen *ebiten.Image) (err error) {
 	}
 
 	if game.IsDebugPrint {
-		msg := fmt.Sprintf(`FPS: %0.2f`, ebiten.CurrentFPS())
-		ebitenutil.DebugPrint(screen, msg)
+		err = debugPrint(screen)
+		if err != nil {
+			return
+		}
 	}
+
+	return
+}
+
+func debugPrint(screen *ebiten.Image) (err error) {
+	const format = `FPS: %0.2f
+mouse: (%d, %d) %v
+keys: %s`
+	mx, my := ebiten.CursorPosition()
+	buttons := []string{}
+	if ebiten.IsMouseButtonPressed(ebiten.MouseButtonLeft) {
+		buttons = append(buttons, "LEFT")
+	}
+	if ebiten.IsMouseButtonPressed(ebiten.MouseButtonRight) {
+		buttons = append(buttons, "RIGHT")
+	}
+	if ebiten.IsMouseButtonPressed(ebiten.MouseButtonMiddle) {
+		buttons = append(buttons, "MIDDLE")
+	}
+	pressed := []ebiten.Key{}
+	for k := ebiten.Key(0); k <= ebiten.KeyMax; k++ {
+		if ebiten.IsKeyPressed(k) {
+			pressed = append(pressed, k)
+		}
+	}
+	keyStrs := []string{}
+	for _, p := range pressed {
+		keyStrs = append(keyStrs, p.String())
+	}
+	msg := fmt.Sprintf(format,
+		ebiten.CurrentFPS(),
+		mx, my, buttons,
+		strings.Join(keyStrs, ", "),
+	)
+	ebitenutil.DebugPrint(screen, msg)
 
 	return
 }
@@ -150,6 +154,8 @@ func draw(screen *ebiten.Image) (err error) {
 func mainLoop(screen *ebiten.Image) (err error) {
 	if ebiten.IsKeyPressed(ebiten.KeySpace) {
 		game.IsRunning = !game.IsRunning
+	} else if ebiten.IsKeyPressed(ebiten.KeyF4) {
+		game.IsDebugPrint = !game.IsDebugPrint
 	} else if ebiten.IsKeyPressed(ebiten.KeyC) {
 		board.Clear()
 		game.IsRunning = false
@@ -162,6 +168,16 @@ func mainLoop(screen *ebiten.Image) (err error) {
 		err = update()
 		if err != nil {
 			return
+		}
+	} else {
+		mx, my := ebiten.CursorPosition()
+		x, y := mx/blockSize, my/blockSize
+		if 0 <= x && x < w && 0 <= y && y < h {
+			if ebiten.IsMouseButtonPressed(ebiten.MouseButtonLeft) {
+				board[y][x] = live
+			} else if ebiten.IsMouseButtonPressed(ebiten.MouseButtonRight) {
+				board[y][x] = dead
+			}
 		}
 	}
 
@@ -177,6 +193,7 @@ func mainLoop(screen *ebiten.Image) (err error) {
 }
 
 func main() {
+	ebiten.SetRunnableInBackground(true)
 	if err := ebiten.Run(mainLoop, screenWidth, screenHeight, 1, "Life (Ebiten Demo)"); err != nil {
 		log.Fatal(err)
 	}
