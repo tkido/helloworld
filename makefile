@@ -7,13 +7,15 @@ GOGET=$(GOCMD) get -u
 BINARY_NAME=mmm.exe
 BINARY_UNIX=$(BINARY_NAME)_unix
 
+PKG_LIFE=exsamples/life
+
 all: test clean asset build
 build:
 	$(GOBUILD) -o $(BINARY_NAME) -v
 test:
 	$(GOTEST) .
 	$(GOTEST) ./core/godfather
-clean: 
+clean:
 	$(GOCLEAN)
 	rm -f $(BINARY_NAME)
 	rm -f $(BINARY_UNIX)
@@ -21,7 +23,8 @@ run:
 	$(GOBUILD) -o $(BINARY_NAME) -v
 	./$(BINARY_NAME)
 asset:
-	go-assets-builder -o=assets.go -p=main assets/
+	go-assets-builder -p=main -o=assets.go assets/
+	go-assets-builder -p=main -o=$(PKG_LIFE)/assets.go -s=/$(PKG_LIFE) $(PKG_LIFE)/assets/
 deps:
 	$(GOGET) github.com/hajimehoshi/ebiten
 	$(GOGET) github.com/golang/freetype/truetype

@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"image"
+	"image/color"
 	_ "image/png"
 	"log"
 	"strings"
@@ -17,17 +18,11 @@ import (
 const (
 	screenWidth  = 640
 	screenHeight = 480
-	blockSize    = 8
-	dead         = 0
-	live         = 9
 )
 
 var (
-	imgSrc   *ebiten.Image
-	srcRects []*image.Rectangle
-	board    Board
-	deltas   []int
-	game     Game
+	imgSrc *ebiten.Image
+	game   Game
 )
 
 // Game is status of game
@@ -35,15 +30,10 @@ type Game struct {
 	IsRunning, IsDebugPrint bool
 }
 
-const (
-	w = screenWidth / blockSize
-	h = screenHeight / blockSize
-)
-
 func init() {
 	rand.Seed(time.Now().UnixNano())
 
-	f, err := Assets.Open("/assets/block00.png")
+	f, err := Assets.Open("/assets/nc35542.png")
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -57,54 +47,19 @@ func init() {
 		log.Fatal(err)
 	}
 
-	deadRect := image.Rect(0, 0, blockSize, blockSize)
-	liveRect := image.Rect(blockSize, 0, blockSize*2, blockSize)
-	srcRects = []*image.Rectangle{&deadRect, &liveRect}
-	deltas = []int{-1, 0, 1}
-
 	game = Game{false, false}
-	board = NewBoard()
-	board.Rand()
-
 }
 
 func update() error {
-	for y := range board {
-		for x, c := range board[y] {
-			if c < live {
-				continue
-			}
-			for _, dy := range deltas {
-				for _, dx := range deltas {
-					board[(y+dy+h)%h][(x+dx+w)%w]++
-				}
-			}
-		}
-	}
-	for y := range board {
-		for x, c := range board[y] {
-			switch c {
-			case 3:
-				board[y][x] = live
-			case 10, 11, 14, 15, 16, 17, 18:
-				board[y][x] = dead
-			default:
-				board[y][x] = c / live * live
-			}
-		}
-	}
 	return nil
 }
 
 func draw(screen *ebiten.Image) (err error) {
-	for y := range board {
-		for x, c := range board[y] {
-			opts := &ebiten.DrawImageOptions{}
-			opts.GeoM.Translate(float64(x)*blockSize, float64(y)*blockSize)
-			opts.SourceRect = srcRects[c/live]
-			screen.DrawImage(imgSrc, opts)
-		}
-	}
+	screen.Fill(color.NRGBA{0x00, 0xff, 0xff, 0xff})
+
+	opts := &ebiten.DrawImageOptions{}
+	opts.GeoM.Scale(0.1, 0.1)
+	screen.DrawImage(imgSrc, opts)
 
 	if game.IsDebugPrint {
 		err = debugPrint(screen)
@@ -114,6 +69,44 @@ func draw(screen *ebiten.Image) (err error) {
 	}
 
 	return
+}
+
+func mainLoop(screen *ebiten.Image) (err error) {
+	if ebiten.IsKeyPressed(ebiten.KeySpace) {
+		game.IsRunning = !game.IsRunning
+	} else if ebiten.IsKeyPressed(ebiten.KeyF4) {
+		game.IsDebugPrint = !game.IsDebugPrint
+	} else if ebiten.IsKeyPressed(ebiten.KeyC) {
+		game.IsRunning = false
+	} else if ebiten.IsKeyPressed(ebiten.KeyR) {
+		game.IsRunning = false
+	}
+
+	if game.IsRunning {
+		err = update()
+		if err != nil {
+			return
+		}
+	} else {
+
+	}
+
+	if ebiten.IsRunningSlowly() {
+		return
+	}
+
+	err = draw(screen)
+	if err != nil {
+		return
+	}
+	return
+}
+
+func main() {
+	ebiten.SetRunnableInBackground(true)
+	if err := ebiten.Run(mainLoop, screenWidth, screenHeight, 1, "Collision (Ebiten Demo)"); err != nil {
+		log.Fatal(err)
+	}
 }
 
 func debugPrint(screen *ebiten.Image) (err error) {
@@ -170,52 +163,4 @@ ScreenScale: %0.2f
 	ebitenutil.DebugPrint(screen, msg)
 
 	return
-}
-
-func mainLoop(screen *ebiten.Image) (err error) {
-	if ebiten.IsKeyPressed(ebiten.KeySpace) {
-		game.IsRunning = !game.IsRunning
-	} else if ebiten.IsKeyPressed(ebiten.KeyF4) {
-		game.IsDebugPrint = !game.IsDebugPrint
-	} else if ebiten.IsKeyPressed(ebiten.KeyC) {
-		board.Clear()
-		game.IsRunning = false
-	} else if ebiten.IsKeyPressed(ebiten.KeyR) {
-		board.Rand()
-		game.IsRunning = false
-	}
-
-	if game.IsRunning {
-		err = update()
-		if err != nil {
-			return
-		}
-	} else {
-		mx, my := ebiten.CursorPosition()
-		x, y := mx/blockSize, my/blockSize
-		if 0 <= x && x < w && 0 <= y && y < h {
-			if ebiten.IsMouseButtonPressed(ebiten.MouseButtonLeft) {
-				board[y][x] = live
-			} else if ebiten.IsMouseButtonPressed(ebiten.MouseButtonRight) {
-				board[y][x] = dead
-			}
-		}
-	}
-
-	if ebiten.IsRunningSlowly() {
-		return
-	}
-
-	err = draw(screen)
-	if err != nil {
-		return
-	}
-	return
-}
-
-func main() {
-	ebiten.SetRunnableInBackground(true)
-	if err := ebiten.Run(mainLoop, screenWidth, screenHeight, 1, "Life (Ebiten Demo)"); err != nil {
-		log.Fatal(err)
-	}
 }
