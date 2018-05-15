@@ -117,9 +117,6 @@ func draw(screen *ebiten.Image) (err error) {
 }
 
 func debugPrint(screen *ebiten.Image) (err error) {
-	const format = `FPS: %0.2f
-mouse: (%d, %d) %v
-keys: %s`
 	mx, my := ebiten.CursorPosition()
 	buttons := []string{}
 	if ebiten.IsMouseButtonPressed(ebiten.MouseButtonLeft) {
@@ -131,6 +128,7 @@ keys: %s`
 	if ebiten.IsMouseButtonPressed(ebiten.MouseButtonMiddle) {
 		buttons = append(buttons, "MIDDLE")
 	}
+
 	pressed := []ebiten.Key{}
 	for k := ebiten.Key(0); k <= ebiten.KeyMax; k++ {
 		if ebiten.IsKeyPressed(k) {
@@ -141,10 +139,33 @@ keys: %s`
 	for _, p := range pressed {
 		keyStrs = append(keyStrs, p.String())
 	}
+
+	sx, sy := ebiten.MonitorSize()
+
+	const format = `FPS: %0.2f
+mouse: (%d, %d) %v
+keys: %s
+IsCursorVisible: %v
+DeviceScaleFactor: %v
+IsFullscreen: %v
+IsRunnableInBackground: %v
+IsRunningSlowly: %v
+IsWindowDecorated: %v
+MonitorSize: (%d, %d)
+ScreenScale: %0.2f
+`
 	msg := fmt.Sprintf(format,
 		ebiten.CurrentFPS(),
 		mx, my, buttons,
 		strings.Join(keyStrs, ", "),
+		ebiten.IsCursorVisible(),
+		ebiten.DeviceScaleFactor(),
+		ebiten.IsFullscreen(),
+		ebiten.IsRunnableInBackground(),
+		ebiten.IsRunningSlowly(),
+		ebiten.IsWindowDecorated(),
+		sx, sy,
+		ebiten.ScreenScale(),
 	)
 	ebitenutil.DebugPrint(screen, msg)
 
