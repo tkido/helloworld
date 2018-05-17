@@ -53,7 +53,7 @@ func update(screen *ebiten.Image) (err error) {
 	if balls == nil {
 		balls = []*Ball{}
 		for i := 0; i < 10; i++ {
-			balls = append(balls, NewBall(rand.Float64()*screenWidth, rand.Float64()*screenHeight, rand.Float64()*20+10, DrawableData{screen, imgSrc}))
+			balls = append(balls, NewBall(rand.Float64()*screenWidth, rand.Float64()*screenHeight, rand.Float64()*20+10, imgSrc))
 		}
 		return
 	}
@@ -70,7 +70,7 @@ func draw(screen *ebiten.Image) (err error) {
 	screen.Fill(color.NRGBA{0x00, 0xff, 0x00, 0xff})
 
 	for _, ball := range balls {
-		ball.Draw()
+		ball.Draw(screen)
 	}
 
 	if game.IsDebugPrint {

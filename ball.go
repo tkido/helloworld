@@ -11,34 +11,25 @@ type Drawable interface {
 	Draw() error
 }
 
-// DrawableData is DrawableData
-type DrawableData struct {
-	Target *ebiten.Image
-	Source *ebiten.Image
-}
-
 // Ball is ball
 type Ball struct {
 	X, Y, R float64
-	DrawableData
+	Image   *ebiten.Image
 }
 
 // NewBall is NewBall
-func NewBall(x, y, r float64, d DrawableData) *Ball {
-	return &Ball{x, y, r, d}
+func NewBall(x, y, r float64, i *ebiten.Image) *Ball {
+	return &Ball{x, y, r, i}
 }
 
 // Draw draw
-func (b *Ball) Draw() (err error) {
-	w, h := b.Source.Size()
+func (b *Ball) Draw(target *ebiten.Image) (err error) {
+	w, h := b.Image.Size()
 	scaleX, scaleY := 2.0*b.R/float64(w), 2.0*b.R/float64(h)
 	opts := &ebiten.DrawImageOptions{}
 	opts.GeoM.Scale(scaleX, scaleY)
 	opts.GeoM.Translate(b.X-b.R, b.Y-b.R)
-	err = b.Target.DrawImage(b.Source, opts)
-	if err != nil {
-		return
-	}
+	target.DrawImage(b.Image, opts)
 	return
 }
 
