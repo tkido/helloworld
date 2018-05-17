@@ -6,11 +6,6 @@ import (
 	"github.com/hajimehoshi/ebiten"
 )
 
-// Drawable is drawable object
-type Drawable interface {
-	Draw() error
-}
-
 // Ball is ball
 type Ball struct {
 	X, Y, R float64
