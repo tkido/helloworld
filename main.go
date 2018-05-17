@@ -55,9 +55,9 @@ func update(screen *ebiten.Image) (err error) {
 		balls = []*Ball{}
 		for i := 0; i < 20; i++ {
 			b := NewBall(
-				rand.Float64()*20+10,
+				rand.Float64()*20+5,
 				vector.Vector{X: rand.Float64() * screenWidth, Y: rand.Float64() * screenHeight},
-				vector.Vector{X: (rand.Float64() - 0.5) * 2, Y: (rand.Float64() - 0.5) * 2},
+				vector.Vector{X: (rand.Float64() - 0.5) * 4, Y: (rand.Float64() - 0.5) * 4},
 				imgSrc)
 
 			balls = append(balls, b)
@@ -118,6 +118,8 @@ func control() (err error) {
 		game.IsRunning = !game.IsRunning
 	} else if ebiten.IsKeyPressed(ebiten.KeyF4) {
 		game.IsDebugPrint = !game.IsDebugPrint
+	} else if ebiten.IsKeyPressed(ebiten.KeyR) {
+		balls = nil
 	}
 
 	return
