@@ -27,15 +27,7 @@ type Game struct {
 	IsRunning, IsDebugPrint bool
 }
 
-// Drawable is drawable object
-type Drawable interface {
-	// SetScreen(*ebiten.Image) error
-	// SetImage(*ebiten.Image) error
-	// SetOptions(*ebiten.DrawImageOptions) error
-	Draw() error
-}
-
-var ball *Ball
+var balls []*Ball
 
 func init() {
 	rand.Seed(time.Now().UnixNano())
@@ -58,13 +50,18 @@ func init() {
 }
 
 func update(screen *ebiten.Image) (err error) {
-	if ball == nil {
-		ball = NewBall(100, 100, 20, DrawableData{screen, imgSrc})
+	if balls == nil {
+		balls = []*Ball{}
+		for i := 0; i < 10; i++ {
+			balls = append(balls, NewBall(rand.Float64()*screenWidth, rand.Float64()*screenHeight, rand.Float64()*20+10, DrawableData{screen, imgSrc}))
+		}
 		return
 	}
-	ball.X++
-	ball.Y++
-	ball.R = ball.R + 0.2
+	for _, ball := range balls {
+		ball.X += rand.Float64() - 0.5
+		ball.Y += rand.Float64() - 0.5
+		ball.R += rand.Float64() - 0.5
+	}
 
 	return
 }
@@ -72,9 +69,8 @@ func update(screen *ebiten.Image) (err error) {
 func draw(screen *ebiten.Image) (err error) {
 	screen.Fill(color.NRGBA{0x00, 0xff, 0x00, 0xff})
 
-	err = ball.Draw()
-	if err != nil {
-		return
+	for _, ball := range balls {
+		ball.Draw()
 	}
 
 	if game.IsDebugPrint {
@@ -88,14 +84,9 @@ func draw(screen *ebiten.Image) (err error) {
 }
 
 func mainLoop(screen *ebiten.Image) (err error) {
-	if ebiten.IsKeyPressed(ebiten.KeySpace) {
-		game.IsRunning = !game.IsRunning
-	} else if ebiten.IsKeyPressed(ebiten.KeyF4) {
-		game.IsDebugPrint = !game.IsDebugPrint
-	} else if ebiten.IsKeyPressed(ebiten.KeyC) {
-		game.IsRunning = false
-	} else if ebiten.IsKeyPressed(ebiten.KeyR) {
-		game.IsRunning = false
+	err = control()
+	if err != nil {
+		return
 	}
 
 	if game.IsRunning {
@@ -103,8 +94,6 @@ func mainLoop(screen *ebiten.Image) (err error) {
 		if err != nil {
 			return
 		}
-	} else {
-
 	}
 
 	if ebiten.IsRunningSlowly() {
@@ -115,6 +104,17 @@ func mainLoop(screen *ebiten.Image) (err error) {
 	if err != nil {
 		return
 	}
+
+	return
+}
+
+func control() (err error) {
+	if ebiten.IsKeyPressed(ebiten.KeySpace) {
+		game.IsRunning = !game.IsRunning
+	} else if ebiten.IsKeyPressed(ebiten.KeyF4) {
+		game.IsDebugPrint = !game.IsDebugPrint
+	}
+
 	return
 }
 

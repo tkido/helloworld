@@ -6,6 +6,17 @@ import (
 	"github.com/hajimehoshi/ebiten"
 )
 
+// Drawable is drawable object
+type Drawable interface {
+	Draw() error
+}
+
+// DrawableData is DrawableData
+type DrawableData struct {
+	Target *ebiten.Image
+	Source *ebiten.Image
+}
+
 // Ball is ball
 type Ball struct {
 	X, Y, R float64
@@ -19,22 +30,16 @@ func NewBall(x, y, r float64, d DrawableData) *Ball {
 
 // Draw draw
 func (b *Ball) Draw() (err error) {
-	w, h := b.Image.Size()
+	w, h := b.Source.Size()
 	scaleX, scaleY := 2.0*b.R/float64(w), 2.0*b.R/float64(h)
 	opts := &ebiten.DrawImageOptions{}
 	opts.GeoM.Scale(scaleX, scaleY)
 	opts.GeoM.Translate(b.X-b.R, b.Y-b.R)
-	err = b.Screen.DrawImage(b.Image, opts)
+	err = b.Target.DrawImage(b.Source, opts)
 	if err != nil {
 		return
 	}
 	return
-}
-
-// DrawableData is DrawableData
-type DrawableData struct {
-	Screen *ebiten.Image
-	Image  *ebiten.Image
 }
 
 func (b *Ball) collisioned(o *Ball) bool {
