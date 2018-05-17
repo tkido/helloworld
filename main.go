@@ -9,6 +9,7 @@ import (
 
 	"math/rand"
 
+	"bitbucket.org/tkido/helloworld/vector"
 	"github.com/hajimehoshi/ebiten"
 )
 
@@ -52,15 +53,19 @@ func init() {
 func update(screen *ebiten.Image) (err error) {
 	if balls == nil {
 		balls = []*Ball{}
-		for i := 0; i < 10; i++ {
-			balls = append(balls, NewBall(rand.Float64()*screenWidth, rand.Float64()*screenHeight, rand.Float64()*20+10, imgSrc))
+		for i := 0; i < 20; i++ {
+			b := NewBall(
+				rand.Float64()*20+10,
+				vector.Vector{X: rand.Float64() * screenWidth, Y: rand.Float64() * screenHeight},
+				vector.Vector{X: (rand.Float64() - 0.5) * 2, Y: (rand.Float64() - 0.5) * 2},
+				imgSrc)
+
+			balls = append(balls, b)
 		}
 		return
 	}
 	for _, ball := range balls {
-		ball.X += rand.Float64() - 0.5
-		ball.Y += rand.Float64() - 0.5
-		ball.R += rand.Float64() - 0.5
+		ball.Update()
 	}
 
 	return
