@@ -1,23 +1,20 @@
 package main
 
 import (
-	"fmt"
 	"image"
 	"image/color"
 	_ "image/png"
 	"log"
-	"strings"
 	"time"
 
 	"math/rand"
 
 	"github.com/hajimehoshi/ebiten"
-	"github.com/hajimehoshi/ebiten/ebitenutil"
 )
 
 const (
-	screenWidth  = 640
-	screenHeight = 480
+	screenWidth  = 512
+	screenHeight = 512
 )
 
 var (
@@ -29,6 +26,16 @@ var (
 type Game struct {
 	IsRunning, IsDebugPrint bool
 }
+
+// Drawable is drawable object
+type Drawable interface {
+	// SetScreen(*ebiten.Image) error
+	// SetImage(*ebiten.Image) error
+	// SetOptions(*ebiten.DrawImageOptions) error
+	Draw() error
+}
+
+var ball *Ball
 
 func init() {
 	rand.Seed(time.Now().UnixNano())
@@ -47,19 +54,28 @@ func init() {
 		log.Fatal(err)
 	}
 
-	game = Game{false, false}
+	game = Game{true, false}
 }
 
-func update() error {
-	return nil
+func update(screen *ebiten.Image) (err error) {
+	if ball == nil {
+		ball = NewBall(100, 100, 20, DrawableData{screen, imgSrc})
+		return
+	}
+	ball.X++
+	ball.Y++
+	ball.R = ball.R + 0.2
+
+	return
 }
 
 func draw(screen *ebiten.Image) (err error) {
-	screen.Fill(color.NRGBA{0x00, 0xff, 0xff, 0xff})
+	screen.Fill(color.NRGBA{0x00, 0xff, 0x00, 0xff})
 
-	opts := &ebiten.DrawImageOptions{}
-	opts.GeoM.Scale(0.1, 0.1)
-	screen.DrawImage(imgSrc, opts)
+	err = ball.Draw()
+	if err != nil {
+		return
+	}
 
 	if game.IsDebugPrint {
 		err = debugPrint(screen)
@@ -83,7 +99,7 @@ func mainLoop(screen *ebiten.Image) (err error) {
 	}
 
 	if game.IsRunning {
-		err = update()
+		err = update(screen)
 		if err != nil {
 			return
 		}
@@ -107,60 +123,4 @@ func main() {
 	if err := ebiten.Run(mainLoop, screenWidth, screenHeight, 1, "Collision (Ebiten Demo)"); err != nil {
 		log.Fatal(err)
 	}
-}
-
-func debugPrint(screen *ebiten.Image) (err error) {
-	mx, my := ebiten.CursorPosition()
-	buttons := []string{}
-	if ebiten.IsMouseButtonPressed(ebiten.MouseButtonLeft) {
-		buttons = append(buttons, "LEFT")
-	}
-	if ebiten.IsMouseButtonPressed(ebiten.MouseButtonRight) {
-		buttons = append(buttons, "RIGHT")
-	}
-	if ebiten.IsMouseButtonPressed(ebiten.MouseButtonMiddle) {
-		buttons = append(buttons, "MIDDLE")
-	}
-
-	pressed := []ebiten.Key{}
-	for k := ebiten.Key(0); k <= ebiten.KeyMax; k++ {
-		if ebiten.IsKeyPressed(k) {
-			pressed = append(pressed, k)
-		}
-	}
-	keyStrs := []string{}
-	for _, p := range pressed {
-		keyStrs = append(keyStrs, p.String())
-	}
-
-	sx, sy := ebiten.MonitorSize()
-
-	const format = `FPS: %0.2f
-mouse: (%d, %d) %v
-keys: %s
-IsCursorVisible: %v
-DeviceScaleFactor: %v
-IsFullscreen: %v
-IsRunnableInBackground: %v
-IsRunningSlowly: %v
-IsWindowDecorated: %v
-MonitorSize: (%d, %d)
-ScreenScale: %0.2f
-`
-	msg := fmt.Sprintf(format,
-		ebiten.CurrentFPS(),
-		mx, my, buttons,
-		strings.Join(keyStrs, ", "),
-		ebiten.IsCursorVisible(),
-		ebiten.DeviceScaleFactor(),
-		ebiten.IsFullscreen(),
-		ebiten.IsRunnableInBackground(),
-		ebiten.IsRunningSlowly(),
-		ebiten.IsWindowDecorated(),
-		sx, sy,
-		ebiten.ScreenScale(),
-	)
-	ebitenutil.DebugPrint(screen, msg)
-
-	return
 }
