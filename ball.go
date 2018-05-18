@@ -3,6 +3,7 @@ package main
 import (
 	"math"
 
+	"bitbucket.org/tkido/helloworld/quadtree"
 	"bitbucket.org/tkido/helloworld/vector"
 	"github.com/hajimehoshi/ebiten"
 )
@@ -12,12 +13,13 @@ type Ball struct {
 	R           float64
 	P, V        vector.Vector
 	Image       *ebiten.Image
+	CellNum     int
 	IsCollision bool
 }
 
 // NewBall is NewBall
 func NewBall(r float64, p, v vector.Vector, i *ebiten.Image) *Ball {
-	return &Ball{r, p, v, i, false}
+	return &Ball{r, p, v, i, -1, false}
 }
 
 // Update is update
@@ -49,6 +51,36 @@ func (b *Ball) Draw(target *ebiten.Image) (err error) {
 
 // CheckCollision is check collision
 func (b *Ball) CheckCollision(o *Ball) bool {
+	count++
 	d := math.Sqrt(math.Pow(b.P.X-o.P.X, 2) + math.Pow(b.P.Y-o.P.Y, 2))
 	return d <= b.R+o.R
+}
+
+// Check is check
+func (b *Ball) Check(c quadtree.Collisioner) bool {
+	count++
+	if b.IsCollision == true {
+		return false
+	}
+	switch o := c.(type) {
+	case *Ball:
+		if b == o {
+			return false
+		}
+		d := math.Sqrt(math.Pow(b.P.X-o.P.X, 2) + math.Pow(b.P.Y-o.P.Y, 2))
+		b.IsCollision = d <= b.R+o.R
+		return true
+	default:
+		return false
+	}
+}
+
+// GetCellNum retruns CellNum
+func (b *Ball) GetCellNum() int {
+	return b.CellNum
+}
+
+// SetCellNum sets CellNum
+func (b *Ball) SetCellNum(c int) {
+	b.CellNum = c
 }

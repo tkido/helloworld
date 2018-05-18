@@ -9,6 +9,8 @@ import (
 
 	"math/rand"
 
+	"bitbucket.org/tkido/helloworld/quadtree"
+
 	"bitbucket.org/tkido/helloworld/vector"
 	"github.com/hajimehoshi/ebiten"
 )
@@ -19,8 +21,11 @@ const (
 )
 
 var (
-	imgSrc *ebiten.Image
-	game   Game
+	imgSrc  *ebiten.Image
+	game    Game
+	manager *quadtree.Manager
+	balls   []*Ball
+	count   int
 )
 
 // Game is status of game
@@ -28,12 +33,10 @@ type Game struct {
 	IsRunning, IsDebugPrint bool
 }
 
-var balls []*Ball
-
 func init() {
 	rand.Seed(time.Now().UnixNano())
 
-	f, err := Assets.Open("/assets/nc35542.png")
+	f, err := Assets.Open("/assets/nc35542small.png")
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -48,6 +51,7 @@ func init() {
 	}
 
 	game = Game{true, false}
+	manager = quadtree.NewManager(screenWidth, screenHeight)
 }
 
 func update(screen *ebiten.Image) (err error) {
@@ -63,22 +67,27 @@ func update(screen *ebiten.Image) (err error) {
 			)
 
 			balls = append(balls, b)
+			manager.Update(b, b.P.X-b.R, b.P.Y-b.R, b.P.X+b.R, b.P.Y+b.R)
 		}
 		return
 	}
-	for _, ball := range balls {
-		ball.Update()
+	for _, b := range balls {
+		b.Update()
+		manager.Update(b, b.P.X-b.R, b.P.Y-b.R, b.P.X+b.R, b.P.Y+b.R)
 	}
-	for _, b1 := range balls {
-		for _, b2 := range balls {
-			if b1 == b2 {
-				continue
-			}
-			if b1.CheckCollision(b2) {
-				b1.IsCollision = true
-			}
-		}
-	}
+	count = 0
+	manager.Check(0)
+	// for _, b1 := range balls {
+	// 	for _, b2 := range balls {
+	// 		if b1 == b2 {
+	// 			continue
+	// 		}
+	// 		if b1.CheckCollision(b2) {
+	// 			b1.IsCollision = true
+	// 		}
+	// 	}
+	// }
+	// fmt.Println(count)
 
 	return
 }
