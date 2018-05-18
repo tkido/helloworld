@@ -2,33 +2,9 @@ package quadtree
 
 var cellMaxs = [7]int{0, 1, 5, 21, 85, 341, 1365}
 
-func cellNum(upperLeft, lowerRight int) int {
-	n := upperLeft ^ lowerRight
-	m := msb(n)
-	l := m / 2
-	if m == -1 {
-		l = -1
-	}
-	shift := (l + 1) * 2
-	return lowerRight>>uint(shift) + cellMaxs[4-l]
-}
-
-func cellNum2(upperLeft, lowerRight int) int {
-	n := upperLeft ^ lowerRight
-	switch {
-	case n>>8&0x3 != 0:
-		return 0
-	case n>>6&0x3 != 0:
-		return lowerRight>>8 + 1
-	case n>>4&0x3 != 0:
-		return lowerRight>>6 + 5
-	case n>>2&0x3 != 0:
-		return lowerRight>>4 + 21
-	case n&0x3 != 0:
-		return lowerRight>>2 + 85
-	default:
-		return lowerRight + 341
-	}
+func cellNum(topLeft, bottomRight int) int {
+	n := (msb(topLeft^bottomRight) + 2) / 2
+	return bottomRight>>uint(n*2) + cellMaxs[5-n]
 }
 
 func count(n int) int {
@@ -40,9 +16,6 @@ func count(n int) int {
 }
 
 func msb(n int) int {
-	if n == 0 {
-		return -1
-	}
 	n |= n >> 1
 	n |= n >> 2
 	n |= n >> 4

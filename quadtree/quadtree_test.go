@@ -1,6 +1,7 @@
 package quadtree
 
 import (
+	"fmt"
 	"testing"
 )
 
@@ -60,6 +61,10 @@ func TestCount(t *testing.T) {
 			t.Errorf("got %v want %v", got, want)
 		}
 	}
+}
+
+func Test(t *testing.T) {
+	fmt.Println(-1 / 2)
 }
 
 func TestMsb(t *testing.T) {
