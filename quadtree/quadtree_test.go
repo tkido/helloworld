@@ -1,7 +1,6 @@
 package quadtree
 
 import (
-	"fmt"
 	"testing"
 )
 
@@ -95,11 +94,14 @@ func TestCellNum(t *testing.T) {
 	cases := []struct {
 		UL, LR, Want int
 	}{
-		{15, 60, 0},
-		{19, 31, 1},
-		{44, 47, 11},
-		{0, 63, 0},
-		{0, 127, 0},
+		{15, 60, 5},
+		{19, 31, 22},
+		{44, 47, 96},
+		{0, 63, 5},
+		{0, 0, 341},
+		{0, 255, 1},
+		{0, 1023, 0},
+		{1023, 1023, 1364},
 	}
 	for _, c := range cases {
 		got := cellNum(c.UL, c.LR)
@@ -108,61 +110,4 @@ func TestCellNum(t *testing.T) {
 			t.Errorf("got %v want %v", got, want)
 		}
 	}
-}
-
-var cellMaxs = [7]int{0, 1, 5, 21, 85, 341, 1365}
-
-func cellNum(upperLeft, lowerRight int) int {
-	n := upperLeft ^ lowerRight
-	// fmt.Println(n)
-	lv := msb(n) / 2
-	fmt.Printf("Lv: %d\n", lv)
-	shift := (lv + 1) * 2
-	fmt.Printf("shift: %d\n", shift)
-	fmt.Println(lowerRight >> uint(shift))
-
-	switch {
-	case n>>8&0x3 != 0:
-		return 0
-	case n>>6&0x3 != 0:
-		return lowerRight>>8 + 1
-	case n>>4&0x3 != 0:
-		return lowerRight>>6 + 5
-	case n>>2&0x3 != 0:
-		return lowerRight>>4 + 21
-	case n&0x3 != 0:
-		return lowerRight>>2 + 85
-	default:
-		return lowerRight + 341
-	}
-}
-
-func count(n int) int {
-	n = n&0x5555 + n>>1&0x5555
-	n = n&0x3333 + n>>2&0x3333
-	n = n&0x0f0f + n>>4&0x0f0f
-	return n&0x00ff + n>>8&0x00ff
-}
-
-func msb(n int) int {
-	if n == 0 {
-		return -1
-	}
-	n |= n >> 1
-	n |= n >> 2
-	n |= n >> 4
-	n |= n >> 8
-	return count(n) - 1
-}
-
-func separate(n int) int {
-	n = (n | (n << 8)) & 0x00ff00ff
-	n = (n | (n << 4)) & 0x0f0f0f0f
-	n = (n | (n << 2)) & 0x33333333
-	n = (n | (n << 1)) & 0x55555555
-	return n
-}
-
-func morton(x, y int) int {
-	return separate(x) | separate(y)<<1
 }
