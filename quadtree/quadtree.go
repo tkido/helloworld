@@ -1,10 +1,10 @@
 package quadtree
 
-var cellMaxs = [7]int{0, 1, 5, 21, 85, 341, 1365}
+var offsets = [7]int{0, 1, 5, 21, 85, 341, 1365}
 
 func cellNum(topLeft, bottomRight int) int {
 	n := (msb(topLeft^bottomRight) + 2) / 2
-	return bottomRight>>uint(n*2) + cellMaxs[5-n]
+	return bottomRight>>uint(n*2) + offsets[5-n]
 }
 
 func count(n int) int {

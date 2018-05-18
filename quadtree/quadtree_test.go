@@ -64,7 +64,8 @@ func TestCount(t *testing.T) {
 }
 
 func Test(t *testing.T) {
-	fmt.Println(-1 / 2)
+	s := []string{"1", "2"}
+	fmt.Println(s[:len(s)-1])
 }
 
 func TestMsb(t *testing.T) {
