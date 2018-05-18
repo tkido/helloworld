@@ -54,11 +54,13 @@ func update(screen *ebiten.Image) (err error) {
 	if balls == nil {
 		balls = []*Ball{}
 		for i := 0; i < 20; i++ {
+			r := rand.Float64()*20 + 5
 			b := NewBall(
-				rand.Float64()*20+5,
-				vector.Vector{X: rand.Float64() * screenWidth, Y: rand.Float64() * screenHeight},
+				r,
+				vector.Vector{X: rand.Float64()*(screenWidth-2*r) + r, Y: rand.Float64()*(screenHeight-2*r) + r},
 				vector.Vector{X: (rand.Float64() - 0.5) * 4, Y: (rand.Float64() - 0.5) * 4},
-				imgSrc)
+				imgSrc,
+			)
 
 			balls = append(balls, b)
 		}
@@ -66,6 +68,17 @@ func update(screen *ebiten.Image) (err error) {
 	}
 	for _, ball := range balls {
 		ball.Update()
+	}
+	for _, b1 := range balls {
+		for _, b2 := range balls {
+			if b1 == b2 {
+				continue
+			}
+			b1.IsCollision = b1.CheckCollision(b2)
+			if b1.IsCollision {
+				break
+			}
+		}
 	}
 
 	return
