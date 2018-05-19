@@ -8,6 +8,7 @@ BINARY_NAME=mmm.exe
 BINARY_UNIX=$(BINARY_NAME)_unix
 
 PKG_LIFE=exsamples/life
+PKG_COLLISION=exsamples/collision
 
 all: test clean asset build
 build:
@@ -25,6 +26,7 @@ run:
 asset:
 	go-assets-builder -p=main -o=assets.go assets/
 	go-assets-builder -p=main -o=$(PKG_LIFE)/assets.go -s=/$(PKG_LIFE) $(PKG_LIFE)/assets/
+	go-assets-builder -p=main -o=$(PKG_COLLISION)/assets.go -s=/$(PKG_COLLISION) $(PKG_COLLISION)/assets/
 deps:
 	$(GOGET) github.com/hajimehoshi/ebiten
 	$(GOGET) github.com/golang/freetype/truetype
