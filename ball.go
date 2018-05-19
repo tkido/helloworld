@@ -38,12 +38,15 @@ func (b *Ball) Update() (err error) {
 // Draw draw
 func (b *Ball) Draw(target *ebiten.Image) (err error) {
 	w, h := b.Image.Size()
+	w = w / 2
 	scaleX, scaleY := 2.0*b.R/float64(w), 2.0*b.R/float64(h)
 	opts := &ebiten.DrawImageOptions{}
 	opts.GeoM.Scale(scaleX, scaleY)
 	opts.GeoM.Translate(b.P.X-b.R, b.P.Y-b.R)
 	if b.IsCollision {
-		opts.ColorM.RotateHue(math.Pi)
+		opts.SourceRect = srcRects[1]
+	} else {
+		opts.SourceRect = srcRects[0]
 	}
 	target.DrawImage(b.Image, opts)
 	return

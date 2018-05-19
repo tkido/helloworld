@@ -51,7 +51,8 @@ func (m *Manager) sanitize(f, max float64) int {
 // Update updates collisioner
 func (m *Manager) Update(c Collisioner, x1, y1, x2, y2 float64) {
 	c0 := c.GetCellNum()
-	tl, br := morton(m.sanitize(x1, m.w), m.sanitize(y1, m.w)), morton(m.sanitize(x2, m.w), m.sanitize(y2, m.w))
+	tl := morton(m.sanitize(x1, m.w), m.sanitize(y1, m.w))
+	br := morton(m.sanitize(x2, m.w), m.sanitize(y2, m.w))
 	c1 := m.cellNum(tl, br)
 	if c0 != c1 {
 		if c0 != -1 {
@@ -69,9 +70,6 @@ func (m *Manager) Check() {
 
 func (m *Manager) check(i int) {
 	list := m.cells[i]
-	// fmt.Printf("%d番セルのチェック\n", i)
-	// fmt.Printf("このセルには%d個のボールが所属する\n", len(list))
-	// fmt.Printf("現在のスタックサイズは%dである\n", len(m.Stack))
 	for c := range list {
 		for o := range list {
 			c.Check(o)
@@ -89,8 +87,4 @@ func (m *Manager) check(i int) {
 		}
 	}
 	m.stack = m.stack[:len(m.stack)-len(list)]
-	// fmt.Printf("%d番セルのチェックを終了する\n", i)
-	// fmt.Printf("スタックから%d個取り除いた\n", len(list))
-	// fmt.Printf("スタックサイズは%dになった\n", len(m.Stack))
-
 }

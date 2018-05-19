@@ -21,11 +21,12 @@ const (
 )
 
 var (
-	imgSrc  *ebiten.Image
-	game    Game
-	manager *quadtree.Manager
-	balls   []*Ball
-	count   int
+	imgSrc   *ebiten.Image
+	game     Game
+	manager  *quadtree.Manager
+	balls    []*Ball
+	count    int
+	srcRects []*image.Rectangle
 )
 
 // Game is status of game
@@ -49,6 +50,10 @@ func init() {
 	if err != nil {
 		log.Fatal(err)
 	}
+	w, h := imgSrc.Size()
+	rect0 := image.Rect(0, 0, w/2, h)
+	rect1 := image.Rect(w/2, 0, w, h)
+	srcRects = []*image.Rectangle{&rect0, &rect1}
 
 	game = Game{true, false}
 	manager = quadtree.NewManager(screenWidth, screenHeight, 3)
@@ -57,7 +62,7 @@ func init() {
 func update(screen *ebiten.Image) (err error) {
 	if balls == nil {
 		balls = []*Ball{}
-		for i := 0; i < 128; i++ {
+		for i := 0; i < 200; i++ {
 			r := rand.Float64()*10 + 5
 			b := NewBall(
 				r,
