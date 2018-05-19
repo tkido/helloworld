@@ -51,13 +51,13 @@ func init() {
 	}
 
 	game = Game{true, false}
-	manager = quadtree.NewManager(screenWidth, screenHeight)
+	manager = quadtree.NewManager(screenWidth, screenHeight, 3)
 }
 
 func update(screen *ebiten.Image) (err error) {
 	if balls == nil {
 		balls = []*Ball{}
-		for i := 0; i < 400; i++ {
+		for i := 0; i < 128; i++ {
 			r := rand.Float64()*10 + 5
 			b := NewBall(
 				r,
@@ -76,17 +76,7 @@ func update(screen *ebiten.Image) (err error) {
 		manager.Update(b, b.P.X-b.R, b.P.Y-b.R, b.P.X+b.R, b.P.Y+b.R)
 	}
 	count = 0
-	manager.Check(0)
-	// for _, b1 := range balls {
-	// 	for _, b2 := range balls {
-	// 		if b1 == b2 {
-	// 			continue
-	// 		}
-	// 		if b1.CheckCollision(b2) {
-	// 			b1.IsCollision = true
-	// 		}
-	// 	}
-	// }
+	manager.Check()
 	// fmt.Println(count)
 
 	return
