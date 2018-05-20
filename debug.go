@@ -1,6 +1,7 @@
 package main
 
 import (
+	"bytes"
 	"fmt"
 	"strings"
 
@@ -45,6 +46,7 @@ IsRunningSlowly: %v
 IsWindowDecorated: %v
 MonitorSize: (%d, %d)
 ScreenScale: %0.2f
+%s
 `
 	msg := fmt.Sprintf(format,
 		ebiten.CurrentFPS(),
@@ -58,8 +60,31 @@ ScreenScale: %0.2f
 		ebiten.IsWindowDecorated(),
 		sx, sy,
 		ebiten.ScreenScale(),
+		gamePadInfo(),
 	)
 	ebitenutil.DebugPrint(screen, msg)
 
 	return
+}
+
+func gamePadInfo() string {
+	ids := ebiten.GamepadIDs()
+	buf := bytes.Buffer{}
+	for _, id := range ids {
+		buf.WriteString(fmt.Sprintf("gamepads[%d]: ", id))
+		axisNum := ebiten.GamepadAxisNum(id)
+		for i := 0; i < axisNum; i++ {
+			buf.WriteString(fmt.Sprintf(" axis[%d]: %f", i, ebiten.GamepadAxis(id, i)))
+		}
+		buttonNum := ebiten.GamepadButtonNum(id)
+		pressed := []int{}
+		for i := 0; i < buttonNum; i++ {
+			if ebiten.IsGamepadButtonPressed(id, ebiten.GamepadButton(i)) {
+				pressed = append(pressed, i)
+			}
+		}
+		buf.WriteString(fmt.Sprintf(" %dbuttons: %v", buttonNum, pressed))
+		buf.WriteString("\n")
+	}
+	return buf.String()
 }
