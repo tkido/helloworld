@@ -3,7 +3,6 @@ package main
 import (
 	"bytes"
 	"fmt"
-	"strings"
 
 	"github.com/hajimehoshi/ebiten"
 	"github.com/hajimehoshi/ebiten/ebitenutil"
@@ -35,10 +34,11 @@ func debugPrint(screen *ebiten.Image) (err error) {
 
 	sx, sy := ebiten.MonitorSize()
 
-	const format = `FPS: %0.2f
-mouse: (%d, %d) %v
-keys: %s
-IsCursorVisible: %v
+	const format = `CurrentFPS: %0.2f
+CursorPosition: (%d, %d)
+IsMouseButtonPressed: %v
+IsKeyPressed: %v
+%sIsCursorVisible: %v
 DeviceScaleFactor: %v
 IsFullscreen: %v
 IsRunnableInBackground: %v
@@ -46,12 +46,12 @@ IsRunningSlowly: %v
 IsWindowDecorated: %v
 MonitorSize: (%d, %d)
 ScreenScale: %0.2f
-%s
 `
 	msg := fmt.Sprintf(format,
 		ebiten.CurrentFPS(),
 		mx, my, buttons,
-		strings.Join(keyStrs, ", "),
+		keyStrs,
+		gamePadInfo(),
 		ebiten.IsCursorVisible(),
 		ebiten.DeviceScaleFactor(),
 		ebiten.IsFullscreen(),
@@ -60,7 +60,6 @@ ScreenScale: %0.2f
 		ebiten.IsWindowDecorated(),
 		sx, sy,
 		ebiten.ScreenScale(),
-		gamePadInfo(),
 	)
 	ebitenutil.DebugPrint(screen, msg)
 
@@ -69,21 +68,29 @@ ScreenScale: %0.2f
 
 func gamePadInfo() string {
 	ids := ebiten.GamepadIDs()
+	if len(ids) == 0 {
+		return "GamepadIDs: []\n"
+	}
 	buf := bytes.Buffer{}
 	for _, id := range ids {
-		buf.WriteString(fmt.Sprintf("gamepads[%d]: ", id))
+		buf.WriteString(fmt.Sprintf("GamepadIDs[%d]:\n", id))
+
 		axisNum := ebiten.GamepadAxisNum(id)
+		buf.WriteString(fmt.Sprintf(" GamepadAxisNum: %d\n  ", axisNum))
 		for i := 0; i < axisNum; i++ {
-			buf.WriteString(fmt.Sprintf(" axis[%d]: %f", i, ebiten.GamepadAxis(id, i)))
+			buf.WriteString(fmt.Sprintf("GamepadAxis[%d]: %f ", i, ebiten.GamepadAxis(id, i)))
 		}
+		buf.WriteString("\n")
+
 		buttonNum := ebiten.GamepadButtonNum(id)
+		buf.WriteString(fmt.Sprintf(" GamepadButtonNum: %d\n  ", buttonNum))
 		pressed := []int{}
 		for i := 0; i < buttonNum; i++ {
 			if ebiten.IsGamepadButtonPressed(id, ebiten.GamepadButton(i)) {
 				pressed = append(pressed, i)
 			}
 		}
-		buf.WriteString(fmt.Sprintf(" %dbuttons: %v", buttonNum, pressed))
+		buf.WriteString(fmt.Sprintf("IsGamepadButtonPressed: %v", pressed))
 		buf.WriteString("\n")
 	}
 	return buf.String()
