@@ -28,6 +28,7 @@ asset:
 	go-assets-builder -p=main -o=$(PKG_LIFE)/assets.go -s=/$(PKG_LIFE) $(PKG_LIFE)/assets/
 	go-assets-builder -p=main -o=$(PKG_COLLISION)/assets.go -s=/$(PKG_COLLISION) $(PKG_COLLISION)/assets/
 deps:
+	$(GOGET) github.com/atotto/clipboard
 	$(GOGET) github.com/hajimehoshi/ebiten
 	$(GOGET) github.com/golang/freetype/truetype
 	$(GOGET) github.com/jessevdk/go-assets

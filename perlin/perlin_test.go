@@ -8,7 +8,7 @@ import (
 	"testing"
 	"time"
 
-	"bitbucket.org/tkido/gostock/my"
+	"github.com/atotto/clipboard"
 )
 
 func TestFloor(t *testing.T) {
@@ -39,11 +39,14 @@ func TestFloor(t *testing.T) {
 }
 func TestPerlin(t *testing.T) {
 	buf := bytes.Buffer{}
-	for x := 0.0; x < 10.01; x += 0.01 {
+	for x := 0.0; x < 10.0; x += 0.01 {
 		s := fmt.Sprintf("%f\t%f\n", x, perlin(x))
 		buf.WriteString(s)
 	}
-	my.WriteFileForCopyPaste("r.html", buf.String())
+	err := clipboard.WriteAll(buf.String())
+	if err != nil {
+		t.Error(err)
+	}
 }
 
 var gradient []float64
@@ -57,24 +60,25 @@ func init() {
 }
 
 func c(x float64) float64 {
-	if x < -1 || 1 < x {
-		return 0
-	}
-	return 1 - 3*math.Pow(x, 2) + 2*math.Pow(math.Abs(x), 3)
+	return 1 - 6*math.Abs(math.Pow(x, 5)) + 15*math.Pow(x, 4) - 10*math.Abs(math.Pow(x, 3))
 }
 
 // -1 <= x < 1
-func wavelet(i int, x float64) float64 {
+func w(i int, x float64) float64 {
 	return c(x) * gradient[int(i)] * x
 }
 
 // 0 <= x < 1
 func perlin(x float64) float64 {
-	if x <= 0 {
+	if x < 0 {
 		return 0
 	}
 	f := math.Floor(x)
 	x = x - f
 	i := int(f)
-	return wavelet(i, x) + x*(wavelet(i+1, x-1)-wavelet(i, x))
+	return w(i, x) + x*(w(i+1, x-1)-w(i, x))
+}
+
+func fractal(x float64) float64 {
+	return 0
 }
