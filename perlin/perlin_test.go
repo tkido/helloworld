@@ -39,8 +39,8 @@ func TestFloor(t *testing.T) {
 }
 func TestPerlin(t *testing.T) {
 	buf := bytes.Buffer{}
-	for x := 0.0; x < 10.0; x += 0.01 {
-		s := fmt.Sprintf("%f\t%f\n", x, perlin(x))
+	for x := 0.0; x < 256.0; x += 0.1 {
+		s := fmt.Sprintf("%f\t%f\n", x, fractal(x))
 		buf.WriteString(s)
 	}
 	err := clipboard.WriteAll(buf.String())
@@ -49,14 +49,20 @@ func TestPerlin(t *testing.T) {
 	}
 }
 
-var gradient []float64
+var maxLevel = 6
+var gradients [][]float64
 
 func init() {
 	rand.Seed(time.Now().UnixNano())
-	gradient = []float64{}
-	for i := 0; i < 100; i++ {
-		gradient = append(gradient, (rand.Float64()-0.5)*2)
+	gradients = [][]float64{}
+	for lv := 0; lv <= maxLevel; lv++ {
+		gradient := []float64{}
+		for i := 0; i <= 256; i++ {
+			gradient = append(gradient, (rand.Float64()-0.5)*2)
+		}
+		gradients = append(gradients, gradient)
 	}
+
 }
 
 func c(x float64) float64 {
@@ -64,21 +70,27 @@ func c(x float64) float64 {
 }
 
 // -1 <= x < 1
-func w(i int, x float64) float64 {
-	return c(x) * gradient[int(i)] * x
+func w(lv, i int, x float64) float64 {
+	return c(x) * gradients[lv][int(i)] * x
 }
 
 // 0 <= x < 1
-func perlin(x float64) float64 {
+func perlin(lv int, x float64) float64 {
 	if x < 0 {
 		return 0
 	}
 	f := math.Floor(x)
 	x = x - f
 	i := int(f)
-	return w(i, x) + x*(w(i+1, x-1)-w(i, x))
+	return w(lv, i, x) + x*(w(lv, i+1, x-1)-w(lv, i, x))
 }
 
 func fractal(x float64) float64 {
-	return 0
+	var scale float64
+	var rst float64
+	for lv := 0; lv <= maxLevel; lv++ {
+		scale = float64(int(1 << uint(lv)))
+		rst += perlin(lv, x/scale) * scale
+	}
+	return rst
 }
