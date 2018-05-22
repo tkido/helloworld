@@ -71,7 +71,7 @@ func c(x float64) float64 {
 
 // -1 <= x < 1
 func w(lv, i int, x float64) float64 {
-	return c(x) * gradients[lv][int(i)] * x
+	return c(x) * gradients[lv][i] * x
 }
 
 // 0 <= x < 1
@@ -82,7 +82,9 @@ func perlin(lv int, x float64) float64 {
 	f := math.Floor(x)
 	x = x - f
 	i := int(f)
-	return w(lv, i, x) + x*(w(lv, i+1, x-1)-w(lv, i, x))
+	w0 := w(lv, i, x)
+	w1 := w(lv, i+1, x-1)
+	return w0 + x*(w1-w0)
 }
 
 func fractal(x float64) float64 {

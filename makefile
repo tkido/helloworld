@@ -3,7 +3,7 @@ GOCMD=go
 GOBUILD=$(GOCMD) build
 GOCLEAN=$(GOCMD) clean
 GOTEST=$(GOCMD) test -v
-GOGET=$(GOCMD) get -u
+GOGET=$(GOCMD) get
 BINARY_NAME=mmm.exe
 BINARY_UNIX=$(BINARY_NAME)_unix
 
