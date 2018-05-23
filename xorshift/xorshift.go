@@ -1,30 +1,40 @@
 package xorshift
 
 import (
-	"math"
+	"math/rand"
 )
 
-// default seed
-var x uint64 = 88172645463325252
-var max = float64(math.MaxUint64)
+const (
+	max  = 1 << 63
+	mask = max - 1
+)
 
-// Seed gave seed
-func Seed(seed int64) {
-	x = uint64(seed)
+// NewXorShift returns rand source
+func NewXorShift() rand.Source64 {
+	return &XorShift{88172645463325252}
 }
 
-func next() uint64 {
-	x = x ^ (x << 7)
-	x = x ^ (x >> 9)
-	return x
+// XorShift is
+type XorShift struct {
+	i uint64
 }
 
-// Float64 returns, as a float64, a pseudo-random number in [0.0,1.0) from the default Source.
-func Float64() float64 {
-	return float64(next()) / max
+// Seed uses the provided seed value to initialize the generator to a deterministic state.
+func (x *XorShift) Seed(seed int64) {
+	x.i = uint64(seed)
+	for j := 0; j < 64; j++ {
+		x.Uint64()
+	}
 }
 
-// Int returns a non-negative pseudo-random int from the default Source.
-func Int() int {
-	return int(next())
+// Uint64 returns a non-negative pseudo-random 64-bit integer as an uint64.
+func (x *XorShift) Uint64() uint64 {
+	x.i = x.i ^ (x.i << 7)
+	x.i = x.i ^ (x.i >> 9)
+	return x.i
+}
+
+// Int63 returns a non-negative pseudo-random 63-bit integer as an int64.
+func (x *XorShift) Int63() int64 {
+	return int64(x.Uint64() & mask)
 }
