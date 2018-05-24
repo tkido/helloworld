@@ -4,9 +4,6 @@ import (
 	"image"
 	_ "image/png"
 	"log"
-	"time"
-
-	"math/rand"
 
 	"bitbucket.org/tkido/helloworld/perlin2d"
 	"github.com/hajimehoshi/ebiten"
@@ -28,10 +25,12 @@ type Game struct {
 }
 
 func init() {
-	seed := time.Now().UnixNano()
-	rand.Seed(seed)
 	game = Game{true, false}
+	updateNoise()
+}
 
+func updateNoise() {
+	perlin2d.SetGradients()
 	noiseImage = image.NewRGBA(image.Rect(0, 0, screenWidth, screenHeight))
 	const l = screenWidth * screenHeight
 	var maxF, minF float64
@@ -46,18 +45,29 @@ func init() {
 		}
 	}
 	// fmt.Printf("%f <= f <= %f", minF, maxF)
-	rand.Seed(seed)
 	for i := 0; i < l; i++ {
 		x := float64(i%screenWidth) / 10.0
 		y := float64(i/screenWidth) / 10.0
 		f := perlin2d.Fractal(x, y)
 		n := uint8((f - minF) / (maxF - minF) * 255)
-		noiseImage.Pix[4*i] = n
-		noiseImage.Pix[4*i+1] = n
-		noiseImage.Pix[4*i+2] = n
-		noiseImage.Pix[4*i+3] = 0xff
-	}
 
+		// noiseImage.Pix[4*i] = n      //R
+		// noiseImage.Pix[4*i+1] = n    //G
+		// noiseImage.Pix[4*i+2] = n    //B
+		// noiseImage.Pix[4*i+3] = 0xff //A
+		if n >= 128 {
+			noiseImage.Pix[4*i] = 0      //R
+			noiseImage.Pix[4*i+1] = n    //G
+			noiseImage.Pix[4*i+2] = 0    //B
+			noiseImage.Pix[4*i+3] = 0xff //A
+		} else {
+			noiseImage.Pix[4*i] = 0      //R
+			noiseImage.Pix[4*i+1] = 255  //G
+			noiseImage.Pix[4*i+2] = 255  //B
+			noiseImage.Pix[4*i+3] = 0xff //A
+		}
+
+	}
 }
 
 func update(screen *ebiten.Image) (err error) {
@@ -108,6 +118,7 @@ func control() (err error) {
 	} else if ebiten.IsKeyPressed(ebiten.KeyF4) {
 		game.IsDebugPrint = !game.IsDebugPrint
 	} else if ebiten.IsKeyPressed(ebiten.KeyR) {
+		updateNoise()
 	}
 
 	return

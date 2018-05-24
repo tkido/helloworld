@@ -19,6 +19,11 @@ type Grad struct {
 var gradients [][][]Grad
 
 func init() {
+	SetGradients()
+}
+
+// SetGradients is
+func SetGradients() {
 	rand.Seed(time.Now().UnixNano())
 	gradients = [][][]Grad{}
 	for lv := 0; lv <= maxLevel; lv++ {
