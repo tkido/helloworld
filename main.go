@@ -2,21 +2,21 @@ package main
 
 import (
 	"image"
-	_ "image/png"
+	"image/color"
 	"log"
 
-	"bitbucket.org/tkido/helloworld/perlin2d"
+	"bitbucket.org/tkido/helloworld/ui"
 	"github.com/hajimehoshi/ebiten"
 )
 
 const (
-	screenWidth  = 320
-	screenHeight = 320
+	screenWidth  = 640
+	screenHeight = 480
 )
 
 var (
-	game       Game
-	noiseImage *image.RGBA
+	game    Game
+	widgets []*ui.Box
 )
 
 // Game is status of game
@@ -26,48 +26,36 @@ type Game struct {
 
 func init() {
 	game = Game{true, false}
-	updateNoise()
+	widgets = []*ui.Box{}
+
+	box := ui.NewBox(100, 200, 50, 50, color.White)
+	widgets = append(widgets, box)
 }
 
-func updateNoise() {
-	perlin2d.SetGradients()
-	noiseImage = image.NewRGBA(image.Rect(0, 0, screenWidth, screenHeight))
-	const l = screenWidth * screenHeight
-	var maxF, minF float64
-	for i := 0; i < l; i++ {
-		x := float64(i%screenWidth) / 10.0
-		y := float64(i/screenWidth) / 10.0
-		f := perlin2d.Fractal(x, y)
-		if f < minF {
-			minF = f
-		} else if f > maxF {
-			maxF = f
+func control(screen *ebiten.Image) (err error) {
+	if ebiten.IsKeyPressed(ebiten.KeySpace) {
+		game.IsRunning = !game.IsRunning
+	} else if ebiten.IsKeyPressed(ebiten.KeyF4) {
+		game.IsDebugPrint = !game.IsDebugPrint
+	} else if ebiten.IsKeyPressed(ebiten.KeyR) {
+	}
+
+	x, y := ebiten.CursorPosition()
+	e := ui.MouseEvent{ui.MouseEventMove, image.Point{x, y}}
+	if e.Point.In(screen.Bounds()) {
+		for _, box := range widgets {
+			if e.Point.In(box.Rect) {
+				ok, err := box.HandleMouseEvent(e)
+				if err != nil {
+					return err
+				}
+				if ok {
+					// end
+				}
+			}
 		}
 	}
-	// fmt.Printf("%f <= f <= %f", minF, maxF)
-	for i := 0; i < l; i++ {
-		x := float64(i%screenWidth) / 10.0
-		y := float64(i/screenWidth) / 10.0
-		f := perlin2d.Fractal(x, y)
-		n := uint8((f - minF) / (maxF - minF) * 255)
-
-		// noiseImage.Pix[4*i] = n      //R
-		// noiseImage.Pix[4*i+1] = n    //G
-		// noiseImage.Pix[4*i+2] = n    //B
-		// noiseImage.Pix[4*i+3] = 0xff //A
-		if n >= 128 {
-			noiseImage.Pix[4*i] = 0      //R
-			noiseImage.Pix[4*i+1] = n    //G
-			noiseImage.Pix[4*i+2] = 0    //B
-			noiseImage.Pix[4*i+3] = 0xff //A
-		} else {
-			noiseImage.Pix[4*i] = 0      //R
-			noiseImage.Pix[4*i+1] = 255  //G
-			noiseImage.Pix[4*i+2] = 255  //B
-			noiseImage.Pix[4*i+3] = 0xff //A
-		}
-
-	}
+	return
 }
 
 func update(screen *ebiten.Image) (err error) {
@@ -75,20 +63,17 @@ func update(screen *ebiten.Image) (err error) {
 }
 
 func draw(screen *ebiten.Image) (err error) {
-	screen.ReplacePixels(noiseImage.Pix)
+	screen.Fill(color.NRGBA{0x00, 0xff, 0x00, 0xff})
 
-	if game.IsDebugPrint {
-		err = debugPrint(screen)
-		if err != nil {
-			return
-		}
+	for _, box := range widgets {
+		box.Draw(screen)
 	}
 
 	return
 }
 
 func mainLoop(screen *ebiten.Image) (err error) {
-	err = control()
+	err = control(screen)
 	if err != nil {
 		return
 	}
@@ -109,16 +94,11 @@ func mainLoop(screen *ebiten.Image) (err error) {
 		return
 	}
 
-	return
-}
-
-func control() (err error) {
-	if ebiten.IsKeyPressed(ebiten.KeySpace) {
-		game.IsRunning = !game.IsRunning
-	} else if ebiten.IsKeyPressed(ebiten.KeyF4) {
-		game.IsDebugPrint = !game.IsDebugPrint
-	} else if ebiten.IsKeyPressed(ebiten.KeyR) {
-		updateNoise()
+	if game.IsDebugPrint {
+		err = debugPrint(screen)
+		if err != nil {
+			return
+		}
 	}
 
 	return

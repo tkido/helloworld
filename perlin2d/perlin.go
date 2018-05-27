@@ -7,7 +7,7 @@ import (
 )
 
 const (
-	max      = 32
+	max      = 32 * 4
 	maxLevel = 5
 )
 
