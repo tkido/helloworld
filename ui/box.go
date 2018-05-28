@@ -57,22 +57,3 @@ func (b *Box) HandleMouseEvent(e MouseEvent) (handled bool, err error) {
 	fmt.Println(e)
 	return true, nil
 }
-
-type MouseEventHandler interface {
-	HandleMouseEvent(e MouseEvent) (handled bool, err error)
-}
-
-type MouseEvent struct {
-	Type  MouseEventType
-	Point image.Point
-}
-
-type MouseEventType int
-
-const (
-	MouseEventMove MouseEventType = iota
-	MouseEventDown
-	MouseEventUp
-	MouseEventDrag
-	MouseEventDrop
-)

@@ -41,7 +41,11 @@ func control(screen *ebiten.Image) (err error) {
 	}
 
 	x, y := ebiten.CursorPosition()
-	e := ui.MouseEvent{ui.MouseEventMove, image.Point{x, y}}
+	e := ui.MouseEvent{
+		Type:  ui.MouseEventMove,
+		Point: image.Point{X: x, Y: y},
+	}
+	e = ui.GetMouseEvent()
 	if e.Point.In(screen.Bounds()) {
 		for _, box := range widgets {
 			if e.Point.In(box.Rect) {
