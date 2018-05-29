@@ -16,39 +16,59 @@ type MouseEvent struct {
 	Point image.Point
 }
 
+func (ev MouseEvent) String() string {
+	var name string
+	switch ev.Type {
+	case MouseMove:
+		name = "Move"
+	case MouseDown:
+		name = "Down"
+	case MouseUp:
+		name = "Up"
+	case MouseDrag:
+		name = "Drag"
+	case MouseDrop:
+		name = "Drop"
+	}
+	return fmt.Sprintf("%s%s", name, ev.Point)
+}
+
 type MouseEventType int
 
 const (
-	MouseEventMove MouseEventType = iota
-	MouseEventDown
-	MouseEventUp
-	MouseEventDrag
-	MouseEventDrop
+	MouseMove MouseEventType = iota
+	MouseDown
+	MouseUp
+	MouseDrag
+	MouseDrop
+	MouseOver
+	MouseLeave
 )
 
 var pressed [3]byte
+var last MouseEvent
 
 func init() {
+
 }
 
-func GetMouseEvent() MouseEvent {
+func GetMouseEvent() (e MouseEvent, updated bool) {
 	for i := 0; i < 3; i++ {
 		if ebiten.IsMouseButtonPressed(ebiten.MouseButton(i)) {
 			pressed[i] = pressed[i]<<1 | 1
 		} else {
 			pressed[i] = pressed[i]<<1 | 0
 		}
-		if i == 0 {
-			fmt.Printf("%08b\n", pressed[i])
-		}
 	}
+	tipe := MouseEventType(pressed[0] & 3)
 
 	x, y := ebiten.CursorPosition()
 	p := image.Point{x, y}
+	e = MouseEvent{tipe, p}
 
-	e := MouseEvent{
-		Type:  MouseEventMove,
-		Point: p,
+	if e != last {
+		last = e
+		return e, true
 	}
-	return e
+	return e, false
 }

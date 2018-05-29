@@ -31,11 +31,11 @@ func (u *Widget) Draw(screen *ebiten.Image) error {
 // NewBox make new Box
 func NewBox(x, y, w, h int, c color.Color) *Box {
 	r := image.Rect(x, y, x+w, y+h)
-	i, _ := ebiten.NewImage(w, h, ebiten.FilterDefault)
-	i.Fill(c)
+	img, _ := ebiten.NewImage(w, h, ebiten.FilterDefault)
+	img.Fill(c)
 	opts := &ebiten.DrawImageOptions{}
 	opts.GeoM.Translate(float64(x), float64(y))
-	b := &Box{r, c, i, opts}
+	b := &Box{r, c, img, opts}
 	return b
 }
 
@@ -53,7 +53,26 @@ func (b *Box) Draw(screen *ebiten.Image) error {
 	return nil
 }
 
+func (b *Box) String() string {
+	return fmt.Sprintf("Box %#v", b)
+}
+
+// SetPosition set position
+func (b *Box) SetPosition(x, y int) error {
+	s := b.Rect.Size()
+	b.Rect = image.Rect(x, y, x+s.X, y+s.Y)
+	img, _ := ebiten.NewImage(s.X, s.Y, ebiten.FilterDefault)
+	img.Fill(b.Color)
+	opts := &ebiten.DrawImageOptions{}
+	opts.GeoM.Translate(float64(x), float64(y))
+	b.DrawImageOptions = opts
+	return nil
+}
+
 func (b *Box) HandleMouseEvent(e MouseEvent) (handled bool, err error) {
-	fmt.Println(e)
+	switch e.Type {
+	case MouseDown, MouseUp:
+		fmt.Printf("Box[%p]:%s\n", b, e)
+	}
 	return true, nil
 }

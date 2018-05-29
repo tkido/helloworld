@@ -1,7 +1,6 @@
 package main
 
 import (
-	"image"
 	"image/color"
 	"log"
 
@@ -29,7 +28,8 @@ func init() {
 	widgets = []*ui.Box{}
 
 	box := ui.NewBox(100, 200, 50, 50, color.White)
-	widgets = append(widgets, box)
+	box2 := ui.NewBox(200, 300, 50, 50, color.Black)
+	widgets = append(widgets, box, box2)
 }
 
 func control(screen *ebiten.Image) (err error) {
@@ -40,21 +40,17 @@ func control(screen *ebiten.Image) (err error) {
 	} else if ebiten.IsKeyPressed(ebiten.KeyR) {
 	}
 
-	x, y := ebiten.CursorPosition()
-	e := ui.MouseEvent{
-		Type:  ui.MouseEventMove,
-		Point: image.Point{X: x, Y: y},
-	}
-	e = ui.GetMouseEvent()
-	if e.Point.In(screen.Bounds()) {
-		for _, box := range widgets {
-			if e.Point.In(box.Rect) {
-				ok, err := box.HandleMouseEvent(e)
-				if err != nil {
-					return err
-				}
-				if ok {
-					// end
+	if e, ok := ui.GetMouseEvent(); ok {
+		if e.Point.In(screen.Bounds()) {
+			for _, box := range widgets {
+				if e.Point.In(box.Rect) {
+					ok, err := box.HandleMouseEvent(e)
+					if err != nil {
+						return err
+					}
+					if ok {
+						// end
+					}
 				}
 			}
 		}
@@ -110,7 +106,7 @@ func mainLoop(screen *ebiten.Image) (err error) {
 
 func main() {
 	ebiten.SetRunnableInBackground(true)
-	if err := ebiten.Run(mainLoop, screenWidth, screenHeight, 1, "Perlin2D (Ebiten Demo)"); err != nil {
+	if err := ebiten.Run(mainLoop, screenWidth, screenHeight, 1, "MouseEvent (Ebiten Demo)"); err != nil {
 		log.Fatal(err)
 	}
 }
