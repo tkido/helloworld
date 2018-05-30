@@ -10,7 +10,7 @@ import (
 
 // Item is ebiten UI item
 type Item interface {
-	Draw(*ebiten.Image, image.Rectangle) error
+	Draw(*ebiten.Image, image.Point, image.Rectangle) error
 	// Move(p image.Point) error
 	Add(Item) error
 	HandleMouseEvent(MouseEvent) (handled bool, err error)
@@ -43,33 +43,34 @@ func (b *Box) Add(c Item) error {
 }
 
 // Draw draw box
-func (b *Box) Draw(screen *ebiten.Image, rect image.Rectangle) error {
-	rect = rect.Intersect(b.Rect)
-	if rect.Empty() {
+func (b *Box) Draw(screen *ebiten.Image, origin image.Point, clip image.Rectangle) error {
+	rect := b.Rect.Add(origin)
+	clip = clip.Intersect(rect)
+	if clip.Empty() {
 		return nil
 	}
 
 	op := &ebiten.DrawImageOptions{}
-	p := b.Rect.Min
+	p := rect.Min
 	// clipped part of image
-	if rect != b.Rect {
-		d := rect.Min.Sub(b.Rect.Min)
-		op.SourceRect = &image.Rectangle{d, d.Add(rect.Size())}
+	if clip != rect {
+		d := clip.Min.Sub(rect.Min)
+		op.SourceRect = &image.Rectangle{d, d.Add(clip.Size())}
 		p = p.Add(d)
 	}
 	op.GeoM.Translate(float64(p.X), float64(p.Y))
 	screen.DrawImage(b.Image, op)
 
 	for _, c := range b.Children {
-		c.Draw(screen, rect)
+		c.Draw(screen, origin.Add(b.Rect.Min), clip)
 	}
 	return nil
 }
 
 // String for fmt.Stringer interface
 func (b *Box) String() string {
-	p := fmt.Sprintf("%p", b)
-	return fmt.Sprintf("Box[%s]%s%s", p[7:11], b.Rect, ColorCode(b.Color))
+	p := fmt.Sprintf("%p", b)[7:11]
+	return fmt.Sprintf("Box[%s]%s%s", p, b.Rect, ColorCode(b.Color))
 }
 
 // Move sets position

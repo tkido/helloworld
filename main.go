@@ -31,15 +31,11 @@ func init() {
 	bg.Add(ui.NewBox(200, 200, 200, 200, color.Black))
 
 	box1 := ui.NewBox(100, 100, 200, 200, color.White)
-	box1.Add(ui.NewBox(70, 80, 50, 50, color.NRGBA{0xff, 0x00, 0x00, 0xff}))
-	box1.Add(ui.NewBox(150, 80, 50, 50, color.NRGBA{0xff, 0x00, 0x00, 0xff}))
-	box1.Add(ui.NewBox(280, 80, 50, 50, color.NRGBA{0xff, 0x00, 0x00, 0xff}))
-	box1.Add(ui.NewBox(70, 180, 50, 50, color.NRGBA{0xff, 0x00, 0x00, 0xff}))
-	box1.Add(ui.NewBox(150, 180, 50, 50, color.NRGBA{0xff, 0x00, 0x00, 0xff}))
-	box1.Add(ui.NewBox(280, 180, 50, 50, color.NRGBA{0xff, 0x00, 0x00, 0xff}))
-	box1.Add(ui.NewBox(70, 280, 50, 50, color.NRGBA{0xff, 0x00, 0x00, 0xff}))
-	box1.Add(ui.NewBox(150, 280, 50, 50, color.NRGBA{0xff, 0x00, 0x00, 0xff}))
-	box1.Add(ui.NewBox(280, 280, 50, 50, color.NRGBA{0xff, 0x00, 0x00, 0xff}))
+	for i := -20; i <= 180; i += 100 {
+		for j := -20; j <= 180; j += 100 {
+			box1.Add(ui.NewBox(i, j, 50, 50, color.NRGBA{0xff, 0x00, 0x00, 0xff}))
+		}
+	}
 	bg.Add(box1)
 }
 
@@ -65,7 +61,7 @@ func update(screen *ebiten.Image) (err error) {
 }
 
 func draw(screen *ebiten.Image) (err error) {
-	bg.Draw(screen, screen.Bounds())
+	bg.Draw(screen, screen.Bounds().Min, screen.Bounds())
 	return
 }
 
