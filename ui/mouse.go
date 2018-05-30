@@ -7,6 +7,15 @@ import (
 	"github.com/hajimehoshi/ebiten"
 )
 
+type MouseManager struct {
+	Downed *Downed
+}
+
+type Downed struct {
+	Item  *Box
+	Point image.Point
+}
+
 type MouseEventHandler interface {
 	HandleMouseEvent(e MouseEvent) (handled bool, err error)
 }
@@ -71,4 +80,13 @@ func GetMouseEvent() (e MouseEvent, updated bool) {
 		return e, true
 	}
 	return e, false
+}
+
+// IsCloseAsClick returns close enough the given two points (button downed and button upped) can be regarded as one click
+func IsCloseAsClick(a, b image.Point) bool {
+	sub := a.Sub(b)
+	if sub.X*sub.X+sub.Y*sub.Y <= 16 {
+		return true
+	}
+	return false
 }

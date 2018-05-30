@@ -14,8 +14,8 @@ const (
 )
 
 var (
-	game    Game
-	widgets []*ui.Box
+	game Game
+	bg   *ui.Box
 )
 
 // Game is status of game
@@ -25,11 +25,10 @@ type Game struct {
 
 func init() {
 	game = Game{true, false}
-	widgets = []*ui.Box{}
 
-	box := ui.NewBox(100, 200, 50, 50, color.White)
-	box2 := ui.NewBox(200, 300, 50, 50, color.Black)
-	widgets = append(widgets, box, box2)
+	bg = ui.NewBox(0, 0, screenWidth, screenHeight, color.NRGBA{0x00, 0xff, 0x00, 0xff})
+	bg.Add(ui.NewBox(100, 100, 200, 200, color.White))
+	bg.Add(ui.NewBox(200, 200, 200, 200, color.Black))
 }
 
 func control(screen *ebiten.Image) (err error) {
@@ -41,18 +40,9 @@ func control(screen *ebiten.Image) (err error) {
 	}
 
 	if e, ok := ui.GetMouseEvent(); ok {
-		if e.Point.In(screen.Bounds()) {
-			for _, box := range widgets {
-				if e.Point.In(box.Rect) {
-					ok, err := box.HandleMouseEvent(e)
-					if err != nil {
-						return err
-					}
-					if ok {
-						// end
-					}
-				}
-			}
+		_, err := bg.HandleMouseEvent(e)
+		if err != nil {
+			log.Panicln(err)
 		}
 	}
 	return
@@ -63,11 +53,7 @@ func update(screen *ebiten.Image) (err error) {
 }
 
 func draw(screen *ebiten.Image) (err error) {
-	screen.Fill(color.NRGBA{0x00, 0xff, 0x00, 0xff})
-
-	for _, box := range widgets {
-		box.Draw(screen)
-	}
+	bg.Draw(screen)
 
 	return
 }

@@ -8,25 +8,13 @@ import (
 	"github.com/hajimehoshi/ebiten"
 )
 
-// Widget is ebiten UI item
-type Widget struct {
-	Children []Widget
+// Item is ebiten UI item
+type Item interface {
+	Draw(*ebiten.Image) error
+	// Move(p image.Point) error
+	Add(Item) error
+	HandleMouseEvent(MouseEvent) (handled bool, err error)
 }
-
-// Draw draw UI to image
-func (u *Widget) Draw(screen *ebiten.Image) error {
-	for _, c := range u.Children {
-		c.Draw(screen)
-	}
-	return nil
-}
-
-// func (u *Widget) HandleEvent() error {
-// 	for _, c := range u.Children {
-// 		c.Draw(screen)
-// 	}
-// 	return nil
-// }
 
 // NewBox make new Box
 func NewBox(x, y, w, h int, c color.Color) *Box {
@@ -35,7 +23,7 @@ func NewBox(x, y, w, h int, c color.Color) *Box {
 	img.Fill(c)
 	opts := &ebiten.DrawImageOptions{}
 	opts.GeoM.Translate(float64(x), float64(y))
-	b := &Box{r, c, img, opts}
+	b := &Box{r, c, img, opts, []Item{}}
 	return b
 }
 
@@ -45,34 +33,75 @@ type Box struct {
 	Color            color.Color
 	Image            *ebiten.Image
 	DrawImageOptions *ebiten.DrawImageOptions
+	Children         []Item
+}
+
+// Add append child item to item
+func (b *Box) Add(c Item) error {
+	b.Children = append(b.Children, c)
+	return nil
 }
 
 // Draw draw box
 func (b *Box) Draw(screen *ebiten.Image) error {
 	screen.DrawImage(b.Image, b.DrawImageOptions)
+	for _, c := range b.Children {
+		c.Draw(screen)
+	}
 	return nil
 }
 
+// String for fmt.Stringer interface
 func (b *Box) String() string {
 	return fmt.Sprintf("Box %#v", b)
 }
 
-// SetPosition set position
-func (b *Box) SetPosition(x, y int) error {
-	s := b.Rect.Size()
-	b.Rect = image.Rect(x, y, x+s.X, y+s.Y)
-	img, _ := ebiten.NewImage(s.X, s.Y, ebiten.FilterDefault)
-	img.Fill(b.Color)
-	opts := &ebiten.DrawImageOptions{}
-	opts.GeoM.Translate(float64(x), float64(y))
-	b.DrawImageOptions = opts
-	return nil
-}
+// Move sets position
+// func (b *Box) Move(x, y int) error {
+// 	s := b.Rect.Size()
+// 	b.Rect = image.Rect(x, y, x+s.X, y+s.Y)
+// 	img, _ := ebiten.NewImage(s.X, s.Y, ebiten.FilterDefault)
+// 	img.Fill(b.Color)
+// 	opts := &ebiten.DrawImageOptions{}
+// 	opts.GeoM.Translate(float64(x), float64(y))
+// 	b.DrawImageOptions = opts
+// 	return nil
+// }
 
+// HandleMouseEvent handle mouse event
 func (b *Box) HandleMouseEvent(e MouseEvent) (handled bool, err error) {
+	// out of range
+	if !e.Point.In(b.Rect) {
+		return
+	}
+	// children first because they are in front of parent
+	for i := len(b.Children) - 1; 0 <= i; i-- {
+		// children are evaluated in reverse order
+		// because that was added later is more front
+		child := b.Children[i]
+		ok, err := child.HandleMouseEvent(e)
+		if err != nil {
+			return false, err
+		}
+		if ok {
+			return true, nil
+		}
+	}
+	// handle myself
 	switch e.Type {
-	case MouseDown, MouseUp:
-		fmt.Printf("Box[%p]:%s\n", b, e)
+	case MouseDown:
+		// fmt.Printf("Box[%p]:%s\n", b, e)
+		m.Downed = &Downed{b, e.Point}
+	case MouseUp:
+		if m.Downed != nil {
+			if m.Downed.Item == b {
+				if IsCloseAsClick(e.Point, (*m.Downed).Point) {
+					fmt.Printf("Box[%p]: %s\n", b, "Clicked!!")
+				}
+			}
+		}
+		m.Downed = nil
+		// fmt.Printf("Box[%p]:%s\n", b, e)
 	}
 	return true, nil
 }
