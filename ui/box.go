@@ -76,9 +76,9 @@ func (b *Box) HandleMouseEvent(e MouseEvent) (handled bool, err error) {
 	}
 	// children first because they are in front of parent
 	for i := len(b.Children) - 1; 0 <= i; i-- {
+		child := b.Children[i]
 		// children are evaluated in reverse order
 		// because that was added later is more front
-		child := b.Children[i]
 		ok, err := child.HandleMouseEvent(e)
 		if err != nil {
 			return false, err

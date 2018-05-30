@@ -25,6 +25,7 @@ type MouseEvent struct {
 	Point image.Point
 }
 
+// String for fmt.Stringer interface
 func (ev MouseEvent) String() string {
 	var name string
 	switch ev.Type {
