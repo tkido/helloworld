@@ -68,7 +68,8 @@ func (b *Box) Draw(screen *ebiten.Image, rect image.Rectangle) error {
 
 // String for fmt.Stringer interface
 func (b *Box) String() string {
-	return fmt.Sprintf("Box %#v", b)
+	p := fmt.Sprintf("%p", b)
+	return fmt.Sprintf("Box[%s]%s%s", p[7:11], b.Rect, ColorCode(b.Color))
 }
 
 // Move sets position
@@ -111,7 +112,7 @@ func (b *Box) HandleMouseEvent(e MouseEvent) (handled bool, err error) {
 		if m.Downed != nil {
 			if m.Downed.Item == b {
 				if IsCloseAsClick(e.Point, (*m.Downed).Point) {
-					fmt.Printf("Box[%p]: %s\n", b, "Clicked!!")
+					fmt.Printf("%s %s\n", b, "Clicked!!")
 				}
 			}
 		}
