@@ -2,6 +2,7 @@ package main
 
 import (
 	"image/color"
+	_ "image/png"
 	"log"
 
 	"bitbucket.org/tkido/helloworld/ui"
@@ -27,8 +28,19 @@ func init() {
 	game = Game{true, false}
 
 	bg = ui.NewBox(0, 0, screenWidth, screenHeight, color.NRGBA{0x00, 0xff, 0x00, 0xff})
-	bg.Add(ui.NewBox(100, 100, 200, 200, color.White))
 	bg.Add(ui.NewBox(200, 200, 200, 200, color.Black))
+
+	box1 := ui.NewBox(100, 100, 200, 200, color.White)
+	box1.Add(ui.NewBox(70, 80, 50, 50, color.NRGBA{0xff, 0x00, 0x00, 0xff}))
+	box1.Add(ui.NewBox(150, 80, 50, 50, color.NRGBA{0xff, 0x00, 0x00, 0xff}))
+	box1.Add(ui.NewBox(280, 80, 50, 50, color.NRGBA{0xff, 0x00, 0x00, 0xff}))
+	box1.Add(ui.NewBox(70, 180, 50, 50, color.NRGBA{0xff, 0x00, 0x00, 0xff}))
+	box1.Add(ui.NewBox(150, 180, 50, 50, color.NRGBA{0xff, 0x00, 0x00, 0xff}))
+	box1.Add(ui.NewBox(280, 180, 50, 50, color.NRGBA{0xff, 0x00, 0x00, 0xff}))
+	box1.Add(ui.NewBox(70, 280, 50, 50, color.NRGBA{0xff, 0x00, 0x00, 0xff}))
+	box1.Add(ui.NewBox(150, 280, 50, 50, color.NRGBA{0xff, 0x00, 0x00, 0xff}))
+	box1.Add(ui.NewBox(280, 280, 50, 50, color.NRGBA{0xff, 0x00, 0x00, 0xff}))
+	bg.Add(box1)
 }
 
 func control(screen *ebiten.Image) (err error) {
@@ -53,8 +65,7 @@ func update(screen *ebiten.Image) (err error) {
 }
 
 func draw(screen *ebiten.Image) (err error) {
-	bg.Draw(screen)
-
+	bg.Draw(screen, screen.Bounds())
 	return
 }
 

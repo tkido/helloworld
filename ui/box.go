@@ -10,21 +10,10 @@ import (
 
 // Item is ebiten UI item
 type Item interface {
-	Draw(*ebiten.Image) error
+	Draw(*ebiten.Image, image.Rectangle) error
 	// Move(p image.Point) error
 	Add(Item) error
 	HandleMouseEvent(MouseEvent) (handled bool, err error)
-}
-
-// NewBox make new Box
-func NewBox(x, y, w, h int, c color.Color) *Box {
-	r := image.Rect(x, y, x+w, y+h)
-	img, _ := ebiten.NewImage(w, h, ebiten.FilterDefault)
-	img.Fill(c)
-	opts := &ebiten.DrawImageOptions{}
-	opts.GeoM.Translate(float64(x), float64(y))
-	b := &Box{r, c, img, opts, []Item{}}
-	return b
 }
 
 // Box is simple box
@@ -36,6 +25,17 @@ type Box struct {
 	Children         []Item
 }
 
+// NewBox make new Box
+func NewBox(x, y, w, h int, c color.Color) *Box {
+	r := image.Rect(x, y, x+w, y+h)
+	img, _ := ebiten.NewImage(w, h, ebiten.FilterDefault)
+	img.Fill(c)
+	// opts := &ebiten.DrawImageOptions{}
+	// opts.GeoM.Translate(float64(x), float64(y))
+	b := &Box{r, c, img, nil, []Item{}}
+	return b
+}
+
 // Add append child item to item
 func (b *Box) Add(c Item) error {
 	b.Children = append(b.Children, c)
@@ -43,10 +43,25 @@ func (b *Box) Add(c Item) error {
 }
 
 // Draw draw box
-func (b *Box) Draw(screen *ebiten.Image) error {
-	screen.DrawImage(b.Image, b.DrawImageOptions)
+func (b *Box) Draw(screen *ebiten.Image, rect image.Rectangle) error {
+	rect = rect.Intersect(b.Rect)
+	if rect.Empty() {
+		return nil
+	}
+
+	op := &ebiten.DrawImageOptions{}
+	p := b.Rect.Min
+	// clipped part of image
+	if rect != b.Rect {
+		d := rect.Min.Sub(b.Rect.Min)
+		op.SourceRect = &image.Rectangle{d, d.Add(rect.Size())}
+		p = p.Add(d)
+	}
+	op.GeoM.Translate(float64(p.X), float64(p.Y))
+	screen.DrawImage(b.Image, op)
+
 	for _, c := range b.Children {
-		c.Draw(screen)
+		c.Draw(screen, rect)
 	}
 	return nil
 }
