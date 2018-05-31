@@ -17,7 +17,17 @@ type Downed struct {
 }
 
 type MouseEventHandler interface {
-	HandleMouseEvent(e MouseEvent) (handled bool, err error)
+	HandleMouseEvent(ev MouseEvent, origin image.Point, clip image.Rectangle) (handled bool, err error)
+	SetCallback(tipe MouseEventType, c Callback)
+}
+
+// Callback is callback function on event
+type Callback func(item Item)
+
+type CallbacksToMounseEvents map[MouseEventType]Callback
+
+func (cbs CallbacksToMounseEvents) SetCallback(t MouseEventType, c Callback) {
+	cbs[t] = c
 }
 
 type MouseEvent struct {
