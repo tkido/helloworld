@@ -10,10 +10,10 @@ import (
 
 // Item is ebiten UI item
 type Item interface {
-	Draw(*ebiten.Image, image.Point, image.Rectangle) error
+	Draw(screen *ebiten.Image, origin image.Point, clip image.Rectangle) error
 	// Move(p image.Point) error
-	Add(Item) error
-	HandleMouseEvent(MouseEvent) (handled bool, err error)
+	Add(item Item) error
+	HandleMouseEvent(ev MouseEvent, origin image.Point, clip image.Rectangle) (handled bool, err error)
 }
 
 // Box is simple box
@@ -86,9 +86,14 @@ func (b *Box) String() string {
 // }
 
 // HandleMouseEvent handle mouse event
-func (b *Box) HandleMouseEvent(e MouseEvent) (handled bool, err error) {
+func (b *Box) HandleMouseEvent(ev MouseEvent, origin image.Point, clip image.Rectangle) (handled bool, err error) {
+	rect := b.Rect.Add(origin)
+	clip = clip.Intersect(rect)
+	if clip.Empty() {
+		return
+	}
 	// out of range
-	if !e.Point.In(b.Rect) {
+	if !ev.Point.In(clip) {
 		return
 	}
 	// children first because they are in front of parent
@@ -96,7 +101,7 @@ func (b *Box) HandleMouseEvent(e MouseEvent) (handled bool, err error) {
 		child := b.Children[i]
 		// children are evaluated in reverse order
 		// because that was added later is more front
-		ok, err := child.HandleMouseEvent(e)
+		ok, err := child.HandleMouseEvent(ev, origin.Add(b.Rect.Min), clip)
 		if err != nil {
 			return false, err
 		}
@@ -105,14 +110,14 @@ func (b *Box) HandleMouseEvent(e MouseEvent) (handled bool, err error) {
 		}
 	}
 	// handle myself
-	switch e.Type {
+	switch ev.Type {
 	case MouseDown:
 		// fmt.Printf("Box[%p]:%s\n", b, e)
-		m.Downed = &Downed{b, e.Point}
+		m.Downed = &Downed{b, ev.Point}
 	case MouseUp:
 		if m.Downed != nil {
 			if m.Downed.Item == b {
-				if IsCloseAsClick(e.Point, (*m.Downed).Point) {
+				if IsCloseAsClick(ev.Point, (*m.Downed).Point) {
 					fmt.Printf("%s %s\n", b, "Clicked!!")
 				}
 			}

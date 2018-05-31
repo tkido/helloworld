@@ -47,8 +47,8 @@ func control(screen *ebiten.Image) (err error) {
 	} else if ebiten.IsKeyPressed(ebiten.KeyR) {
 	}
 
-	if e, ok := ui.GetMouseEvent(); ok {
-		_, err := bg.HandleMouseEvent(e)
+	if ev, ok := ui.GetMouseEvent(); ok {
+		_, err := bg.HandleMouseEvent(ev, screen.Bounds().Min, screen.Bounds())
 		if err != nil {
 			log.Panicln(err)
 		}
