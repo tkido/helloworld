@@ -25,12 +25,13 @@ type Box struct {
 	Image            *ebiten.Image
 	DrawImageOptions *ebiten.DrawImageOptions
 	Children         []Item
+	CallbacksToMounseEvents
 }
 
 // NewBox make new Box
 func NewBox(w, h int, c color.Color) *Box {
 	r := image.Rect(0, 0, w, h)
-	b := &Box{r, c, nil, nil, []Item{}}
+	b := &Box{r, c, nil, nil, []Item{}, CallbacksToMounseEvents{}}
 	b.Reflesh()
 	return b
 }
@@ -119,6 +120,10 @@ func (b *Box) HandleMouseEvent(ev MouseEvent, origin image.Point, clip image.Rec
 		}
 	}
 	// handle myself
+	if callBack, ok := b.CallbacksToMounseEvents[ev.Type]; ok {
+		callBack(b)
+		return true
+	}
 	switch ev.Type {
 	case MouseDown:
 		// fmt.Printf("Box[%p]:%s\n", b, e)

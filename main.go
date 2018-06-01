@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"image/color"
 	_ "image/png"
 	"log"
@@ -19,6 +20,11 @@ var (
 	bg   *ui.Box
 )
 
+// PrintMine is debug print
+func PrintMine(item ui.Item) {
+	fmt.Printf("%s %s\n", item, "Callbacked!!!!!")
+}
+
 // Game is status of game
 type Game struct {
 	IsRunning, IsDebugPrint bool
@@ -28,6 +34,7 @@ func init() {
 	game = Game{true, false}
 
 	bg = ui.NewBox(screenWidth, screenHeight, color.NRGBA{0x00, 0xff, 0x00, 0xff})
+	bg.SetCallback(ui.MouseUp, PrintMine)
 	bg.Add(200, 200, ui.NewBox(200, 200, color.Black))
 
 	box1 := ui.NewBox(200, 200, color.White)
