@@ -7,31 +7,27 @@ import (
 	"github.com/hajimehoshi/ebiten"
 )
 
+// MouseManager manage status of mouse for ui
 type MouseManager struct {
-	Downed *Downed
+	Downed, Clicked *MouseRecord
 }
 
-type Downed struct {
+// MouseRecord is Record of mouse move and event
+type MouseRecord struct {
 	Item  *Box
 	Point image.Point
+	Frame int
 }
 
+// MouseEventHandler is
 type MouseEventHandler interface {
 	HandleMouseEvent(ev MouseEvent, origin image.Point, clip image.Rectangle) (handled bool, err error)
-	SetCallback(tipe MouseEventType, c Callback)
+	SetCallback(tipe EventType, c Callback)
 }
 
-// Callback is callback function on event
-type Callback func(item Item)
-
-type CallbacksToMounseEvents map[MouseEventType]Callback
-
-func (cbs CallbacksToMounseEvents) SetCallback(t MouseEventType, c Callback) {
-	cbs[t] = c
-}
-
+// MouseEvent is event about mouse action
 type MouseEvent struct {
-	Type  MouseEventType
+	Type  EventType
 	Point image.Point
 }
 
@@ -53,16 +49,19 @@ func (ev MouseEvent) String() string {
 	return fmt.Sprintf("%s%s", name, ev.Point)
 }
 
-type MouseEventType int
+// EventType is type of all UI event
+type EventType int
 
 const (
-	MouseMove MouseEventType = iota
+	MouseMove EventType = iota
 	MouseDown
 	MouseUp
 	MouseDrag
 	MouseDrop
 	MouseOver
 	MouseLeave
+	MouseClick
+	MouseDoubleClick
 )
 
 var pressed [3]byte
@@ -73,6 +72,14 @@ func init() {
 }
 
 func GetMouseEvent() (e MouseEvent, updated bool) {
+	m.Now++
+	if m.Clicked != nil {
+		if m.Now-m.Clicked.Frame > 20 {
+			m.Clicked.Item.Callbacks[MouseClick](m.Clicked.Item)
+			m.Clicked = nil
+		}
+	}
+
 	for i := 0; i < 3; i++ {
 		if ebiten.IsMouseButtonPressed(ebiten.MouseButton(i)) {
 			pressed[i] = pressed[i]<<1 | 1
@@ -80,7 +87,7 @@ func GetMouseEvent() (e MouseEvent, updated bool) {
 			pressed[i] = pressed[i]<<1 | 0
 		}
 	}
-	tipe := MouseEventType(pressed[0] & 3)
+	tipe := EventType(pressed[0] & 3)
 
 	x, y := ebiten.CursorPosition()
 	p := image.Point{x, y}
@@ -91,13 +98,4 @@ func GetMouseEvent() (e MouseEvent, updated bool) {
 		return e, true
 	}
 	return e, false
-}
-
-// IsCloseAsClick returns close enough the given two points (button downed and button upped) can be regarded as one click
-func IsCloseAsClick(a, b image.Point) bool {
-	sub := a.Sub(b)
-	if sub.X*sub.X+sub.Y*sub.Y <= 16 {
-		return true
-	}
-	return false
 }

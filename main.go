@@ -20,9 +20,16 @@ var (
 	bg   *ui.Box
 )
 
-// PrintMine is debug print
-func PrintMine(item ui.Item) {
-	fmt.Printf("%s %s\n", item, "Callbacked!!!!!")
+func onClick(i ui.Item) {
+	fmt.Printf("%s %s\n", i, "clicked!!")
+}
+func onDoubleClick(i ui.Item) {
+	fmt.Printf("%s %s\n", i, "double clicked!!!!")
+}
+
+func expand(i ui.Item) {
+	w, h := i.Size()
+	i.Resize(w+10, h+10)
 }
 
 // Game is status of game
@@ -34,13 +41,16 @@ func init() {
 	game = Game{true, false}
 
 	bg = ui.NewBox(screenWidth, screenHeight, color.NRGBA{0x00, 0xff, 0x00, 0xff})
-	bg.SetCallback(ui.MouseUp, PrintMine)
+	bg.SetCallback(ui.MouseClick, onClick)
+	bg.SetCallback(ui.MouseDoubleClick, onDoubleClick)
 	bg.Add(200, 200, ui.NewBox(200, 200, color.Black))
 
 	box1 := ui.NewBox(200, 200, color.White)
 	for i := -20; i <= 180; i += 100 {
 		for j := -20; j <= 180; j += 100 {
-			box1.Add(i, j, ui.NewBox(50, 50, color.NRGBA{0xff, 0x00, 0x00, 0xff}))
+			box := ui.NewBox(50, 50, color.NRGBA{0xff, 0x00, 0x00, 0xff})
+			box.SetCallback(ui.MouseUp, expand)
+			box1.Add(i, j, box)
 		}
 	}
 	bg.Add(100, 100, box1)
@@ -52,6 +62,7 @@ func control(screen *ebiten.Image) (err error) {
 	} else if ebiten.IsKeyPressed(ebiten.KeyF4) {
 		game.IsDebugPrint = !game.IsDebugPrint
 	} else if ebiten.IsKeyPressed(ebiten.KeyR) {
+
 	}
 
 	if ev, ok := ui.GetMouseEvent(); ok {

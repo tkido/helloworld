@@ -25,13 +25,13 @@ type Box struct {
 	Image            *ebiten.Image
 	DrawImageOptions *ebiten.DrawImageOptions
 	Children         []Item
-	CallbacksToMounseEvents
+	Callbacks
 }
 
 // NewBox make new Box
 func NewBox(w, h int, c color.Color) *Box {
 	r := image.Rect(0, 0, w, h)
-	b := &Box{r, c, nil, nil, []Item{}, CallbacksToMounseEvents{}}
+	b := &Box{r, c, nil, nil, []Item{}, Callbacks{}}
 	b.Reflesh()
 	return b
 }
@@ -119,27 +119,46 @@ func (b *Box) HandleMouseEvent(ev MouseEvent, origin image.Point, clip image.Rec
 			return true
 		}
 	}
-	// handle myself
-	if callBack, ok := b.CallbacksToMounseEvents[ev.Type]; ok {
-		callBack(b)
-		return true
-	}
+
+	// handle by myself
 	switch ev.Type {
 	case MouseDown:
-		// fmt.Printf("Box[%p]:%s\n", b, e)
-		m.Downed = &Downed{b, ev.Point}
+		m.Downed = &MouseRecord{b, ev.Point, m.Now}
 	case MouseUp:
-		if m.Downed != nil {
+		if m.Clicked != nil {
+			fmt.Printf("%d, %d\n", m.Now, m.Clicked.Frame)
+			if m.Clicked.Item == b {
+				if m.Now-m.Clicked.Frame <= 20 {
+					// It's double click
+					ev = MouseEvent{MouseDoubleClick, ev.Point}
+					m.Clicked = nil
+				} else {
+					m.Clicked = &MouseRecord{b, ev.Point, m.Now}
+					ev = MouseEvent{MouseClick, ev.Point}
+				}
+			}
+		} else if m.Downed != nil {
 			if m.Downed.Item == b {
-				if IsCloseAsClick(ev.Point, (*m.Downed).Point) {
-					w, h := b.Size()
-					b.Resize(w+10, h+10)
-					fmt.Printf("%s %s\n", b, "Clicked!!")
+				if isCloseEnough(ev.Point, (*m.Downed).Point) {
+					m.Clicked = &MouseRecord{b, ev.Point, m.Now}
+					ev = MouseEvent{MouseClick, ev.Point}
 				}
 			}
 		}
 		m.Downed = nil
-		// fmt.Printf("Box[%p]:%s\n", b, e)
 	}
+
+	if callBack, ok := b.Callbacks[ev.Type]; ok {
+		if ev.Type == MouseClick {
+			if _, ok := b.Callbacks[MouseClick]; ok {
+				if _, ok := b.Callbacks[MouseDoubleClick]; ok {
+					return true
+				}
+			}
+		}
+		callBack(b)
+		return true
+	}
+
 	return true
 }
