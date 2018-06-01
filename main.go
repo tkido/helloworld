@@ -27,16 +27,16 @@ type Game struct {
 func init() {
 	game = Game{true, false}
 
-	bg = ui.NewBox(0, 0, screenWidth, screenHeight, color.NRGBA{0x00, 0xff, 0x00, 0xff})
-	bg.Add(ui.NewBox(200, 200, 200, 200, color.Black))
+	bg = ui.NewBox(screenWidth, screenHeight, color.NRGBA{0x00, 0xff, 0x00, 0xff})
+	bg.Add(200, 200, ui.NewBox(200, 200, color.Black))
 
-	box1 := ui.NewBox(100, 100, 200, 200, color.White)
+	box1 := ui.NewBox(200, 200, color.White)
 	for i := -20; i <= 180; i += 100 {
 		for j := -20; j <= 180; j += 100 {
-			box1.Add(ui.NewBox(i, j, 50, 50, color.NRGBA{0xff, 0x00, 0x00, 0xff}))
+			box1.Add(i, j, ui.NewBox(50, 50, color.NRGBA{0xff, 0x00, 0x00, 0xff}))
 		}
 	}
-	bg.Add(box1)
+	bg.Add(100, 100, box1)
 }
 
 func control(screen *ebiten.Image) (err error) {
@@ -48,10 +48,7 @@ func control(screen *ebiten.Image) (err error) {
 	}
 
 	if ev, ok := ui.GetMouseEvent(); ok {
-		_, err := bg.HandleMouseEvent(ev, screen.Bounds().Min, screen.Bounds())
-		if err != nil {
-			log.Panicln(err)
-		}
+		bg.HandleMouseEvent(ev, screen.Bounds().Min, screen.Bounds())
 	}
 	return
 }

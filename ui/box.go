@@ -10,10 +10,12 @@ import (
 
 // Item is ebiten UI item
 type Item interface {
-	Draw(screen *ebiten.Image, origin image.Point, clip image.Rectangle) error
-	// Move(p image.Point) error
-	Add(item Item) error
-	HandleMouseEvent(ev MouseEvent, origin image.Point, clip image.Rectangle) (handled bool, err error)
+	Draw(screen *ebiten.Image, origin image.Point, clip image.Rectangle)
+	Move(x, y int)
+	Resize(w, h int)
+	Size() (w, h int)
+	Add(x, y int, item Item)
+	HandleMouseEvent(ev MouseEvent, origin image.Point, clip image.Rectangle) (handled bool)
 }
 
 // Box is simple box
@@ -26,28 +28,50 @@ type Box struct {
 }
 
 // NewBox make new Box
-func NewBox(x, y, w, h int, c color.Color) *Box {
-	r := image.Rect(x, y, x+w, y+h)
-	img, _ := ebiten.NewImage(w, h, ebiten.FilterDefault)
-	img.Fill(c)
-	// opts := &ebiten.DrawImageOptions{}
-	// opts.GeoM.Translate(float64(x), float64(y))
-	b := &Box{r, c, img, nil, []Item{}}
+func NewBox(w, h int, c color.Color) *Box {
+	r := image.Rect(0, 0, w, h)
+	b := &Box{r, c, nil, nil, []Item{}}
+	b.Reflesh()
 	return b
 }
 
+// Reflesh updates internal Image *ebiten.Image
+func (b *Box) Reflesh() {
+	w, h := b.Size()
+	b.Image, _ = ebiten.NewImage(w, h, ebiten.FilterDefault)
+	b.Image.Fill(b.Color)
+}
+
 // Add append child item to item
-func (b *Box) Add(c Item) error {
+func (b *Box) Add(x, y int, c Item) {
+	c.Move(x, y)
 	b.Children = append(b.Children, c)
-	return nil
+}
+
+// Move move item. (x, y) is relative position from parent.
+func (b *Box) Move(x, y int) {
+	b.Rect = b.Rect.Add(image.Point{x, y})
+}
+
+// Resize resize item
+func (b *Box) Resize(w, h int) {
+	x, y := b.Rect.Min.X, b.Rect.Min.Y
+	b.Rect = image.Rect(x, y, x+w, y+h)
+	b.Reflesh()
+}
+
+// Size get size of item
+func (b *Box) Size() (w, h int) {
+	s := b.Rect.Size()
+	return s.X, s.Y
 }
 
 // Draw draw box
-func (b *Box) Draw(screen *ebiten.Image, origin image.Point, clip image.Rectangle) error {
+func (b *Box) Draw(screen *ebiten.Image, origin image.Point, clip image.Rectangle) {
 	rect := b.Rect.Add(origin)
 	clip = clip.Intersect(rect)
 	if clip.Empty() {
-		return nil
+		return
 	}
 
 	op := &ebiten.DrawImageOptions{}
@@ -64,7 +88,7 @@ func (b *Box) Draw(screen *ebiten.Image, origin image.Point, clip image.Rectangl
 	for _, c := range b.Children {
 		c.Draw(screen, origin.Add(b.Rect.Min), clip)
 	}
-	return nil
+	return
 }
 
 // String for fmt.Stringer interface
@@ -73,20 +97,8 @@ func (b *Box) String() string {
 	return fmt.Sprintf("Box[%s]%s%s", p, b.Rect, ColorCode(b.Color))
 }
 
-// Move sets position
-// func (b *Box) Move(x, y int) error {
-// 	s := b.Rect.Size()
-// 	b.Rect = image.Rect(x, y, x+s.X, y+s.Y)
-// 	img, _ := ebiten.NewImage(s.X, s.Y, ebiten.FilterDefault)
-// 	img.Fill(b.Color)
-// 	opts := &ebiten.DrawImageOptions{}
-// 	opts.GeoM.Translate(float64(x), float64(y))
-// 	b.DrawImageOptions = opts
-// 	return nil
-// }
-
 // HandleMouseEvent handle mouse event
-func (b *Box) HandleMouseEvent(ev MouseEvent, origin image.Point, clip image.Rectangle) (handled bool, err error) {
+func (b *Box) HandleMouseEvent(ev MouseEvent, origin image.Point, clip image.Rectangle) (handled bool) {
 	rect := b.Rect.Add(origin)
 	clip = clip.Intersect(rect)
 	if clip.Empty() {
@@ -101,12 +113,9 @@ func (b *Box) HandleMouseEvent(ev MouseEvent, origin image.Point, clip image.Rec
 		child := b.Children[i]
 		// children are evaluated in reverse order
 		// because that was added later is more front
-		ok, err := child.HandleMouseEvent(ev, origin.Add(b.Rect.Min), clip)
-		if err != nil {
-			return false, err
-		}
+		ok := child.HandleMouseEvent(ev, origin.Add(b.Rect.Min), clip)
 		if ok {
-			return true, nil
+			return true
 		}
 	}
 	// handle myself
@@ -118,6 +127,8 @@ func (b *Box) HandleMouseEvent(ev MouseEvent, origin image.Point, clip image.Rec
 		if m.Downed != nil {
 			if m.Downed.Item == b {
 				if IsCloseAsClick(ev.Point, (*m.Downed).Point) {
+					w, h := b.Size()
+					b.Resize(w+10, h+10)
 					fmt.Printf("%s %s\n", b, "Clicked!!")
 				}
 			}
@@ -125,5 +136,5 @@ func (b *Box) HandleMouseEvent(ev MouseEvent, origin image.Point, clip image.Rec
 		m.Downed = nil
 		// fmt.Printf("Box[%p]:%s\n", b, e)
 	}
-	return true, nil
+	return true
 }
