@@ -73,9 +73,12 @@ func init() {
 
 func GetMouseEvent() (e MouseEvent, updated bool) {
 	m.Now++
+	// defered click event callback
 	if m.Clicked != nil {
-		if m.Now-m.Clicked.Frame > 20 {
-			m.Clicked.Item.Callbacks[MouseClick](m.Clicked.Item)
+		if m.Now-m.Clicked.Frame > 15 {
+			if c, ok := m.Clicked.Item.Callbacks[MouseClick]; ok {
+				c(m.Clicked.Item)
+			}
 			m.Clicked = nil
 		}
 	}
