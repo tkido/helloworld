@@ -159,6 +159,11 @@ func (b *Box) HandleMouseEvent(ev MouseEvent, origin image.Point, clip image.Rec
 	}
 
 	if callBack, ok := b.Callbacks[ev.Type]; ok {
+		// defer callback to click.
+		// if both clicks and callbacks to double clicks are set,
+		// it will not be confirmed whether this click is single click
+		// or a first part of double click,
+		// until one more click comes in for a certain period of time is there.
 		if ev.Type == MouseClick {
 			if _, ok := b.Callbacks[MouseClick]; ok {
 				if _, ok := b.Callbacks[MouseDoubleClick]; ok {
@@ -166,6 +171,7 @@ func (b *Box) HandleMouseEvent(ev MouseEvent, origin image.Point, clip image.Rec
 				}
 			}
 		}
+		// Do callback
 		callBack(b)
 		return true
 	}
