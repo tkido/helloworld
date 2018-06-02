@@ -26,7 +26,6 @@ func onClick(i ui.Item) {
 func onDoubleClick(i ui.Item) {
 	fmt.Printf("%s %s\n", i, "double clicked!!!!")
 }
-
 func expand(i ui.Item) {
 	w, h := i.Size()
 	i.Resize(w+10, h+10)

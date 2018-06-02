@@ -67,15 +67,15 @@ const (
 var pressed [3]byte
 var last MouseEvent
 
-func init() {
+// doubleClickInterval as frame(1/60 second)
+const doubleClickInterval = 15
 
-}
-
+// GetMouseEvent make new mouse event
 func GetMouseEvent() (e MouseEvent, updated bool) {
 	m.Now++
 	// defered click event callback
 	if m.Clicked != nil {
-		if m.Now-m.Clicked.Frame > 15 {
+		if m.Now-m.Clicked.Frame > doubleClickInterval {
 			if c, ok := m.Clicked.Item.Callbacks[MouseClick]; ok {
 				c(m.Clicked.Item)
 			}
