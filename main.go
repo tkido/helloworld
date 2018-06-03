@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"image"
 	"image/color"
 	_ "image/png"
 	"log"
@@ -37,9 +38,20 @@ type Game struct {
 }
 
 func init() {
+	f, err := Assets.Open("/assets/food_tenpura_ebiten.png")
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer f.Close()
+	png, _, err := image.Decode(f)
+	if err != nil {
+		log.Fatal(err)
+	}
+
 	game = Game{true, false}
 
 	bg = ui.NewBox(screenWidth, screenHeight, color.NRGBA{0x00, 0xff, 0x00, 0xff})
+
 	bg.SetCallback(ui.MouseClick, onClick)
 	bg.SetCallback(ui.MouseDoubleClick, onDoubleClick)
 	bg.Add(200, 200, ui.NewBox(200, 200, color.Black))
@@ -53,6 +65,11 @@ func init() {
 		}
 	}
 	bg.Add(100, 100, box1)
+
+	img := ui.NewImage(100, 100, png)
+	img.SetCallback(ui.MouseClick, expand)
+	box1.Add(-10, 120, img)
+
 }
 
 func control(screen *ebiten.Image) (err error) {

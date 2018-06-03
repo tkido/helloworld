@@ -10,6 +10,9 @@ import (
 // ColorCode show RGBA color HTML color codes like.
 // e.g. White -> #ffffffff
 func ColorCode(c color.Color) string {
+	if c == nil {
+		return "#nil"
+	}
 	rgba := [4]uint32{}
 	rgba[0], rgba[1], rgba[2], rgba[3] = c.RGBA()
 	buf := bytes.Buffer{}

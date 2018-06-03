@@ -11,6 +11,7 @@ import (
 // Item is ebiten UI item
 type Item interface {
 	Draw(screen *ebiten.Image, origin image.Point, clip image.Rectangle)
+	Reflesh()
 	Move(x, y int)
 	Resize(w, h int)
 	Size() (w, h int)
@@ -26,18 +27,22 @@ type Box struct {
 	DrawImageOptions *ebiten.DrawImageOptions
 	Children         []Item
 	Callbacks
+	Super Item
 }
 
 // NewBox make new Box
 func NewBox(w, h int, c color.Color) *Box {
 	r := image.Rect(0, 0, w, h)
-	b := &Box{r, c, nil, nil, []Item{}, Callbacks{}}
-	b.Reflesh()
+	b := &Box{r, c, nil, nil, []Item{}, Callbacks{}, nil}
+	b.Super = b
 	return b
 }
 
 // Reflesh updates internal Image *ebiten.Image
 func (b *Box) Reflesh() {
+	if b.Color == nil || b.Color == color.Transparent {
+		return
+	}
 	w, h := b.Size()
 	b.Image, _ = ebiten.NewImage(w, h, ebiten.FilterDefault)
 	b.Image.Fill(b.Color)
@@ -58,7 +63,7 @@ func (b *Box) Move(x, y int) {
 func (b *Box) Resize(w, h int) {
 	x, y := b.Rect.Min.X, b.Rect.Min.Y
 	b.Rect = image.Rect(x, y, x+w, y+h)
-	b.Reflesh()
+	b.Image = nil
 }
 
 // Size get size of item
@@ -75,6 +80,21 @@ func (b *Box) Draw(screen *ebiten.Image, origin image.Point, clip image.Rectangl
 		return
 	}
 
+	b.draw(screen, rect, clip)
+
+	for _, c := range b.Children {
+		c.Draw(screen, origin.Add(b.Rect.Min), clip)
+	}
+}
+
+// draw myself
+func (b *Box) draw(screen *ebiten.Image, rect, clip image.Rectangle) {
+	if b.Image == nil {
+		b.Super.Reflesh()
+	}
+	if b.Image == nil {
+		return
+	}
 	op := &ebiten.DrawImageOptions{}
 	p := rect.Min
 	// clipped part of image
@@ -85,11 +105,6 @@ func (b *Box) Draw(screen *ebiten.Image, origin image.Point, clip image.Rectangl
 	}
 	op.GeoM.Translate(float64(p.X), float64(p.Y))
 	screen.DrawImage(b.Image, op)
-
-	for _, c := range b.Children {
-		c.Draw(screen, origin.Add(b.Rect.Min), clip)
-	}
-	return
 }
 
 // String for fmt.Stringer interface
@@ -139,7 +154,7 @@ func (b *Box) HandleMouseEvent(ev MouseEvent, origin image.Point, clip image.Rec
 				}
 			} else {
 				if c, ok := m.Clicked.Item.Callbacks[MouseClick]; ok {
-					c(m.Clicked.Item)
+					c(m.Clicked.Item.Super)
 				}
 				if _, ok := b.Callbacks[MouseDoubleClick]; ok {
 					m.Clicked = &MouseRecord{b, ev.Point, m.Now}
@@ -172,7 +187,7 @@ func (b *Box) HandleMouseEvent(ev MouseEvent, origin image.Point, clip image.Rec
 			}
 		}
 		// Do callback
-		callBack(b)
+		callBack(b.Super)
 		return true
 	}
 

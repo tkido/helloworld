@@ -12,7 +12,7 @@ type MouseManager struct {
 	Downed, Clicked *MouseRecord
 }
 
-// MouseRecord is Record of mouse move and event
+// MouseRecord is record of mouse move and event
 type MouseRecord struct {
 	Item  *Box
 	Point image.Point
@@ -77,7 +77,7 @@ func GetMouseEvent() (e MouseEvent, updated bool) {
 	if m.Clicked != nil {
 		if m.Now-m.Clicked.Frame > doubleClickInterval {
 			if c, ok := m.Clicked.Item.Callbacks[MouseClick]; ok {
-				c(m.Clicked.Item)
+				c(m.Clicked.Item.Super)
 			}
 			m.Clicked = nil
 		}
