@@ -38,7 +38,7 @@ func NewBox(w, h int, c color.Color) *Box {
 	return b
 }
 
-// Reflesh updates internal Image *ebiten.Image
+// Reflesh updates internal *ebiten.Image
 func (b *Box) Reflesh() {
 	if b.Color == nil || b.Color == color.Transparent {
 		return

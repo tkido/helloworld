@@ -5,20 +5,28 @@ import (
 	"image"
 	"image/color"
 	_ "image/png"
+	"io/ioutil"
 	"log"
 
 	"bitbucket.org/tkido/helloworld/ui"
+	"github.com/golang/freetype/truetype"
 	"github.com/hajimehoshi/ebiten"
+	"github.com/hajimehoshi/ebiten/text"
+	"golang.org/x/image/font"
 )
 
 const (
 	screenWidth  = 640
 	screenHeight = 480
+
+	dpi      = 72
+	fontSize = 24
 )
 
 var (
-	game Game
-	bg   *ui.Box
+	game            Game
+	bg              *ui.Box
+	mplusNormalFont font.Face
 )
 
 func onClick(i ui.Item) {
@@ -38,6 +46,7 @@ type Game struct {
 }
 
 func init() {
+	// images
 	f, err := Assets.Open("/assets/food_tenpura_ebiten.png")
 	if err != nil {
 		log.Fatal(err)
@@ -47,7 +56,27 @@ func init() {
 	if err != nil {
 		log.Fatal(err)
 	}
+	// fonts
+	ttf, err := Assets.Open("/assets/mplus-1p-regular.ttf")
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer ttf.Close()
+	bs, err := ioutil.ReadAll(ttf)
+	if err != nil {
+		log.Fatal(err)
+	}
+	tt, err := truetype.Parse(bs)
+	if err != nil {
+		log.Fatal(err)
+	}
 
+	mplusNormalFont = truetype.NewFace(tt, &truetype.Options{
+		Size:    fontSize,
+		DPI:     dpi,
+		Hinting: font.HintingFull,
+	})
+	// game
 	game = Game{true, false}
 
 	bg = ui.NewBox(screenWidth, screenHeight, color.NRGBA{0x00, 0xff, 0x00, 0xff})
@@ -69,6 +98,9 @@ func init() {
 	img := ui.NewImage(100, 100, png)
 	img.SetCallback(ui.MouseClick, expand)
 	box1.Add(-10, 120, img)
+
+	label := ui.NewLabel(100, 100, "こんばんわ", mplusNormalFont, color.White, 24)
+	bg.Add(0, 0, label)
 
 }
 
@@ -93,6 +125,8 @@ func update(screen *ebiten.Image) (err error) {
 
 func draw(screen *ebiten.Image) (err error) {
 	bg.Draw(screen, screen.Bounds().Min, screen.Bounds())
+
+	text.Draw(screen, "こんにちわ", mplusNormalFont, 300, 40, color.White)
 	return
 }
 

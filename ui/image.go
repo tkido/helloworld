@@ -13,7 +13,7 @@ type Image struct {
 	Source image.Image
 }
 
-// NewImage make new Image
+// NewImage make new *ui.Image
 func NewImage(w, h int, srcImg image.Image) *Image {
 	r := image.Rect(0, 0, w, h)
 	b := Box{r, nil, nil, nil, []Item{}, Callbacks{}, nil}
@@ -28,10 +28,10 @@ func (i *Image) Reflesh() {
 	w, h := i.Size()
 	srcW, srcH := srcImg.Bounds().Dx(), srcImg.Bounds().Dy()
 	scaleW, scaleH := float64(w)/float64(srcW), float64(h)/float64(srcH)
-	i.Box.Image, _ = ebiten.NewImage(w, h, ebiten.FilterDefault)
+	i.Image, _ = ebiten.NewImage(w, h, ebiten.FilterDefault)
 	op := &ebiten.DrawImageOptions{}
 	op.GeoM.Scale(scaleW, scaleH)
-	i.Box.Image.DrawImage(srcImg, op)
+	i.Image.DrawImage(srcImg, op)
 }
 
 // String for fmt.Stringer interface
