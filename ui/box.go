@@ -8,17 +8,6 @@ import (
 	"github.com/hajimehoshi/ebiten"
 )
 
-// Item is ebiten UI item
-type Item interface {
-	Draw(screen *ebiten.Image, origin image.Point, clip image.Rectangle)
-	Reflesh()
-	Move(x, y int)
-	Resize(w, h int)
-	Size() (w, h int)
-	Add(x, y int, item Item)
-	HandleMouseEvent(ev MouseEvent, origin image.Point, clip image.Rectangle) (handled bool)
-}
-
 // Box is simple box
 type Box struct {
 	Rect             image.Rectangle
@@ -27,14 +16,14 @@ type Box struct {
 	DrawImageOptions *ebiten.DrawImageOptions
 	Children         []Item
 	Callbacks
-	Super Item
+	Sub Item
 }
 
 // NewBox make new Box
 func NewBox(w, h int, c color.Color) *Box {
 	r := image.Rect(0, 0, w, h)
 	b := &Box{r, c, nil, nil, []Item{}, Callbacks{}, nil}
-	b.Super = b
+	b.Sub = b
 	return b
 }
 
@@ -90,7 +79,7 @@ func (b *Box) Draw(screen *ebiten.Image, origin image.Point, clip image.Rectangl
 // draw myself
 func (b *Box) draw(screen *ebiten.Image, rect, clip image.Rectangle) {
 	if b.Image == nil {
-		b.Super.Reflesh()
+		b.Sub.Reflesh()
 	}
 	if b.Image == nil {
 		return
@@ -154,7 +143,7 @@ func (b *Box) HandleMouseEvent(ev MouseEvent, origin image.Point, clip image.Rec
 				}
 			} else {
 				if c, ok := m.Clicked.Item.Callbacks[MouseClick]; ok {
-					c(m.Clicked.Item.Super)
+					c(m.Clicked.Item.Sub)
 				}
 				if _, ok := b.Callbacks[MouseDoubleClick]; ok {
 					m.Clicked = &MouseRecord{b, ev.Point, m.Now}
@@ -187,7 +176,7 @@ func (b *Box) HandleMouseEvent(ev MouseEvent, origin image.Point, clip image.Rec
 			}
 		}
 		// Do callback
-		callBack(b.Super)
+		callBack(b.Sub)
 		return true
 	}
 

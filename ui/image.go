@@ -18,7 +18,7 @@ func NewImage(w, h int, srcImg image.Image) *Image {
 	r := image.Rect(0, 0, w, h)
 	b := Box{r, nil, nil, nil, []Item{}, Callbacks{}, nil}
 	i := &Image{b, srcImg}
-	i.Box.Super = i
+	i.Sub = i
 	return i
 }
 

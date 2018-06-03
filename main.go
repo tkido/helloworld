@@ -11,7 +11,6 @@ import (
 	"bitbucket.org/tkido/helloworld/ui"
 	"github.com/golang/freetype/truetype"
 	"github.com/hajimehoshi/ebiten"
-	"github.com/hajimehoshi/ebiten/text"
 	"golang.org/x/image/font"
 )
 
@@ -125,8 +124,6 @@ func update(screen *ebiten.Image) (err error) {
 
 func draw(screen *ebiten.Image) (err error) {
 	bg.Draw(screen, screen.Bounds().Min, screen.Bounds())
-
-	text.Draw(screen, "こんにちわ", mplusNormalFont, 300, 40, color.White)
 	return
 }
 

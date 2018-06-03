@@ -77,7 +77,7 @@ func GetMouseEvent() (e MouseEvent, updated bool) {
 	if m.Clicked != nil {
 		if m.Now-m.Clicked.Frame > doubleClickInterval {
 			if c, ok := m.Clicked.Item.Callbacks[MouseClick]; ok {
-				c(m.Clicked.Item.Super)
+				c(m.Clicked.Item.Sub)
 			}
 			m.Clicked = nil
 		}

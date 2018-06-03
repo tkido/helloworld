@@ -25,13 +25,12 @@ func NewLabel(w, h int, text string, face font.Face, c color.Color, s int) *Labe
 	r := image.Rect(0, 0, w, h)
 	b := Box{r, nil, nil, nil, []Item{}, Callbacks{}, nil}
 	l := &Label{b, text, face, c, s}
-	l.Box.Super = l
+	l.Sub = l
 	return l
 }
 
 // Reflesh updates internal *ebiten.Image
 func (l *Label) Reflesh() {
-	fmt.Println("label Reflesh")
 	w, h := l.Size()
 	l.Image, _ = ebiten.NewImage(w, h, ebiten.FilterDefault)
 	text.Draw(l.Image, "テスト", l.Face, 0, 40, l.FontColor)
