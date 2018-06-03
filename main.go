@@ -101,6 +101,8 @@ func init() {
 	label := ui.NewLabel(100, 100, "こんばんわ", mplusNormalFont, color.White, 24)
 	bg.Add(0, 0, label)
 
+	bg.Move(50, 50)
+
 }
 
 func control(screen *ebiten.Image) (err error) {
@@ -112,9 +114,7 @@ func control(screen *ebiten.Image) (err error) {
 
 	}
 
-	if ev, ok := ui.GetMouseEvent(); ok {
-		bg.HandleMouseEvent(ev, screen.Bounds().Min, screen.Bounds())
-	}
+	ui.Update(bg)
 	return
 }
 
@@ -123,7 +123,7 @@ func update(screen *ebiten.Image) (err error) {
 }
 
 func draw(screen *ebiten.Image) (err error) {
-	bg.Draw(screen, screen.Bounds().Min, screen.Bounds())
+	ui.Draw(screen, bg)
 	return
 }
 

@@ -72,16 +72,6 @@ const doubleClickInterval = 15
 
 // GetMouseEvent make new mouse event
 func GetMouseEvent() (e MouseEvent, updated bool) {
-	m.Now++
-	// defered click event callback
-	if m.Clicked != nil {
-		if m.Now-m.Clicked.Frame > doubleClickInterval {
-			if c, ok := m.Clicked.Item.Callbacks[MouseClick]; ok {
-				c(m.Clicked.Item.Sub)
-			}
-			m.Clicked = nil
-		}
-	}
 
 	for i := 0; i < 3; i++ {
 		if ebiten.IsMouseButtonPressed(ebiten.MouseButton(i)) {

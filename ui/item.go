@@ -11,6 +11,8 @@ type Item interface {
 	Draw(screen *ebiten.Image, origin image.Point, clip image.Rectangle)
 	Reflesh()
 	Move(x, y int)
+	Position() (x, y int)
+	Rectangle() image.Rectangle
 	Resize(w, h int)
 	Size() (w, h int)
 	Add(x, y int, item Item)

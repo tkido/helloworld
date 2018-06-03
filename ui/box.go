@@ -48,6 +48,17 @@ func (b *Box) Move(x, y int) {
 	b.Rect = b.Rect.Add(image.Point{x, y})
 }
 
+// Position return relative position from parent Item
+func (b *Box) Position() (x, y int) {
+	min := b.Rect.Min
+	return min.X, min.Y
+}
+
+// Rectangle return Rectangle
+func (b *Box) Rectangle() image.Rectangle {
+	return b.Rect
+}
+
 // Resize resize item
 func (b *Box) Resize(w, h int) {
 	x, y := b.Rect.Min.X, b.Rect.Min.Y
