@@ -1,6 +1,10 @@
 package ui
 
-import "github.com/hajimehoshi/ebiten"
+import (
+	"image"
+
+	"github.com/hajimehoshi/ebiten"
+)
 
 // Update ui
 func Update(bg Item) {
@@ -16,13 +20,11 @@ func Update(bg Item) {
 	}
 
 	if ev, ok := GetMouseEvent(); ok {
-		rect := bg.Rectangle()
-		bg.HandleMouseEvent(ev, rect.Min, rect)
+		bg.HandleMouseEvent(ev, image.ZP, bg.Rectangle())
 	}
 }
 
 // Draw ui
 func Draw(screen *ebiten.Image, bg Item) {
-	rect := bg.Rectangle()
-	bg.Draw(screen, rect.Min, rect)
+	bg.Draw(screen, image.ZP, bg.Rectangle())
 }

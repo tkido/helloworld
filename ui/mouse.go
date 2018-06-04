@@ -52,6 +52,7 @@ func (ev MouseEvent) String() string {
 // EventType is type of all UI event
 type EventType int
 
+// MouseEvents
 const (
 	MouseMove EventType = iota
 	MouseDown
@@ -72,7 +73,6 @@ const doubleClickInterval = 15
 
 // GetMouseEvent make new mouse event
 func GetMouseEvent() (e MouseEvent, updated bool) {
-
 	for i := 0; i < 3; i++ {
 		if ebiten.IsMouseButtonPressed(ebiten.MouseButton(i)) {
 			pressed[i] = pressed[i]<<1 | 1
