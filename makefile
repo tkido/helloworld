@@ -11,22 +11,7 @@ PKG_LIFE=exsamples/life
 PKG_COLLISION=exsamples/collision
 
 all: test clean asset build
-build:
-	$(GOBUILD) -o $(BINARY_NAME) -v
-test:
-	$(GOTEST) .
-	$(GOTEST) ./core/godfather
-clean:
-	$(GOCLEAN)
-	rm -f $(BINARY_NAME)
-	rm -f $(BINARY_UNIX)
-run:
-	$(GOBUILD) -o $(BINARY_NAME) -v
-	./$(BINARY_NAME)
-asset:
-	go-assets-builder -p=main -o=assets.go assets/
-	go-assets-builder -p=main -o=$(PKG_LIFE)/assets.go -s=/$(PKG_LIFE) $(PKG_LIFE)/assets/
-	go-assets-builder -p=main -o=$(PKG_COLLISION)/assets.go -s=/$(PKG_COLLISION) $(PKG_COLLISION)/assets/
+run: clean build execute
 deps:
 	$(GOGET) github.com/atotto/clipboard
 	$(GOGET) github.com/hajimehoshi/ebiten
@@ -34,6 +19,21 @@ deps:
 	$(GOGET) github.com/jessevdk/go-assets
 	$(GOGET) github.com/jessevdk/go-assets-builder
 	$(GOGET) golang.org/x/image/font
+asset:
+	go-assets-builder -p=main -o=assets.go assets/
+	go-assets-builder -p=main -o=$(PKG_LIFE)/assets.go -s=/$(PKG_LIFE) $(PKG_LIFE)/assets/
+	go-assets-builder -p=main -o=$(PKG_COLLISION)/assets.go -s=/$(PKG_COLLISION) $(PKG_COLLISION)/assets/
+test:
+	$(GOTEST) .
+	$(GOTEST) ./core/godfather
+clean:
+	$(GOCLEAN)
+	rm -f $(BINARY_NAME)
+	rm -f $(BINARY_UNIX)
+build:
+	$(GOBUILD) -o $(BINARY_NAME) -v
+execute:
+	./$(BINARY_NAME)
 
 # Cross compilation
 build-linux:
