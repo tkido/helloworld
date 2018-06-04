@@ -7,7 +7,6 @@ import (
 
 	"golang.org/x/image/font"
 
-	"github.com/hajimehoshi/ebiten"
 	"github.com/hajimehoshi/ebiten/text"
 )
 
@@ -21,23 +20,27 @@ type Label struct {
 }
 
 // NewLabel make new *ui.Label
-func NewLabel(w, h int, text string, face font.Face, c color.Color, s int) *Label {
+func NewLabel(w, h int, text string, face font.Face, color, bgColor color.Color, s int) *Label {
 	r := image.Rect(0, 0, w, h)
-	b := Box{r, nil, nil, nil, []Item{}, Callbacks{}, nil}
-	l := &Label{b, text, face, c, s}
+	b := Box{r, bgColor, nil, nil, []Item{}, Callbacks{}, nil}
+	l := &Label{b, text, face, color, s}
 	l.Sub = l
 	return l
 }
 
 // Reflesh updates internal *ebiten.Image
 func (l *Label) Reflesh() {
-	w, h := l.Size()
-	l.Image, _ = ebiten.NewImage(w, h, ebiten.FilterDefault)
-	text.Draw(l.Image, "テスト", l.Face, 0, 40, l.FontColor)
+	l.Box.Reflesh()
+	_, h := l.Size()
+	// l.Image, _ = ebiten.NewImage(w, h, ebiten.FilterDefault)
+	text.Draw(l.Image, "テストテa.", l.Face, 0, h, l.FontColor)
+	fmt.Println(l.Face.GlyphBounds('テ'))
+	fmt.Println(l.Face.GlyphBounds('a'))
+	fmt.Println(l.Face.GlyphBounds('.'))
 }
 
 // String for fmt.Stringer interface
 func (l *Label) String() string {
 	p := fmt.Sprintf("%p", l)[7:11]
-	return fmt.Sprintf("Label[%s]%s:%s", p, l.Text, l.Box.Rect)
+	return fmt.Sprintf("Label[%s]%s:%s", p, l.Text, l.Rect)
 }

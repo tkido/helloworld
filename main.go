@@ -98,11 +98,8 @@ func init() {
 	img.SetCallback(ui.MouseClick, expand)
 	box1.Add(-10, 120, img)
 
-	label := ui.NewLabel(100, 100, "こんばんわ", mplusNormalFont, color.White, 24)
-	bg.Add(0, 0, label)
-
-	bg.Move(50, 50)
-
+	label := ui.NewLabel(screenWidth/2, 24, "こんばんわ", mplusNormalFont, color.White, color.Black, 24)
+	bg.Add(10, 10, label)
 }
 
 func control(screen *ebiten.Image) (err error) {
