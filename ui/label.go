@@ -32,11 +32,11 @@ func NewLabel(w, h int, text string, face font.Face, color, bgColor color.Color,
 func (l *Label) Reflesh() {
 	l.Box.Reflesh()
 	_, h := l.Size()
-	// l.Image, _ = ebiten.NewImage(w, h, ebiten.FilterDefault)
-	text.Draw(l.Image, "テストテa.", l.Face, 0, h, l.FontColor)
-	fmt.Println(l.Face.GlyphBounds('テ'))
-	fmt.Println(l.Face.GlyphBounds('a'))
-	fmt.Println(l.Face.GlyphBounds('.'))
+	text.Draw(l.Image, l.Text, l.Face, 0, h-3, l.FontColor)
+	// for _, r := range l.Text {
+	// 	s := fmt.Sprint(l.Face.GlyphBounds(r))
+	// 	fmt.Printf("%s:%s\n", string(r), s)
+	// }
 }
 
 // String for fmt.Stringer interface

@@ -23,9 +23,9 @@ const (
 )
 
 var (
-	game            Game
-	bg              *ui.Box
-	mplusNormalFont font.Face
+	game       Game
+	bg         *ui.Box
+	normalFont font.Face
 )
 
 func onClick(i ui.Item) {
@@ -56,7 +56,7 @@ func init() {
 		log.Fatal(err)
 	}
 	// fonts
-	ttf, err := Assets.Open("/assets/mplus-1p-regular.ttf")
+	ttf, err := Assets.Open("/assets/PixelMplus12-Regular.ttf")
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -70,7 +70,7 @@ func init() {
 		log.Fatal(err)
 	}
 
-	mplusNormalFont = truetype.NewFace(tt, &truetype.Options{
+	normalFont = truetype.NewFace(tt, &truetype.Options{
 		Size:    fontSize,
 		DPI:     dpi,
 		Hinting: font.HintingFull,
@@ -98,7 +98,7 @@ func init() {
 	img.SetCallback(ui.MouseClick, expand)
 	box1.Add(-10, 120, img)
 
-	label := ui.NewLabel(screenWidth/2, 24, "こんばんわ", mplusNormalFont, color.White, color.Black, 24)
+	label := ui.NewLabel(screenWidth, 24, ".fjあいうアイウ愛飢男■★◆Ａｊｆ", normalFont, color.White, color.Black, 24)
 	bg.Add(10, 10, label)
 }
 

@@ -10,6 +10,7 @@ import (
 // MouseManager manage status of mouse for ui
 type MouseManager struct {
 	Downed, Clicked *MouseRecord
+	Overed          Item
 }
 
 // MouseRecord is record of mouse move and event
@@ -60,6 +61,8 @@ const (
 	MouseDrag
 	MouseDrop
 	MouseOver
+	MouseOut
+	MouseEnter
 	MouseLeave
 	MouseClick
 	MouseDoubleClick
