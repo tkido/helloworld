@@ -113,6 +113,12 @@ func (b *Box) String() string {
 	return fmt.Sprintf("Box[%s]%s%s", p, b.Rect, ColorCode(b.Color))
 }
 
+func (b *Box) call(t EventType) {
+	if c, ok := b.Callbacks[t]; ok {
+		c(b.Sub)
+	}
+}
+
 // HandleMouseEvent handle mouse event
 func (b *Box) HandleMouseEvent(ev MouseEvent, origin image.Point, clip image.Rectangle) (handled bool) {
 	rect := b.Rect.Add(origin)
@@ -136,60 +142,30 @@ func (b *Box) HandleMouseEvent(ev MouseEvent, origin image.Point, clip image.Rec
 	}
 
 	// handle by myself
-	switch ev.Type {
-	case MouseDown:
-		m.Downed = &MouseRecord{b, ev.Point, m.Now}
-	case MouseUp:
-		if m.Clicked != nil {
-			if m.Clicked.Item == b {
-				if m.Now-m.Clicked.Frame <= doubleClickInterval && isCloseEnough(ev.Point, m.Clicked.Point) {
-					// It's double click
-					ev = MouseEvent{MouseDoubleClick, ev.Point}
-					m.Clicked = nil
+	for i := 0; i < 3; i++ {
+		down, up, click, doubleClick := LeftDown+EventType(i), LeftUp+EventType(i), LeftClick+EventType(i), LeftDoubleClick+EventType(i)
+		switch ev.Moves[i] {
+		case Down:
+			b.call(down)
+			m.Downed[i] = &MouseRecord{b, ev.Point, m.Now}
+		case Up:
+			b.call(up)
+			if m.Downed[i] != nil && m.Downed[i].Item == b && isCloseEnough(ev.Point, m.Downed[i].Point) {
+				if m.Clicked[i] != nil {
+					if m.Clicked[i].Item == b && m.Now-m.Clicked[i].Frame <= doubleClickInterval && isCloseEnough(ev.Point, m.Clicked[i].Point) {
+						b.call(doubleClick)
+					} else {
+						m.Clicked[i].Item.call(click)
+					}
+					m.Clicked[i] = nil
+				} else if _, ok := b.Callbacks[doubleClick]; ok {
+					m.Clicked[i] = &MouseRecord{b, ev.Point, m.Now}
 				} else {
-					if _, ok := b.Callbacks[MouseDoubleClick]; ok {
-						m.Clicked = &MouseRecord{b, ev.Point, m.Now}
-					}
-					ev = MouseEvent{MouseClick, ev.Point}
-				}
-			} else {
-				if c, ok := m.Clicked.Item.Callbacks[MouseClick]; ok {
-					c(m.Clicked.Item.Sub)
-				}
-				if _, ok := b.Callbacks[MouseDoubleClick]; ok {
-					m.Clicked = &MouseRecord{b, ev.Point, m.Now}
+					b.call(click)
 				}
 			}
-		} else if m.Downed != nil {
-			if m.Downed.Item == b {
-				if isCloseEnough(ev.Point, m.Downed.Point) {
-					if _, ok := b.Callbacks[MouseDoubleClick]; ok {
-						m.Clicked = &MouseRecord{b, ev.Point, m.Now}
-					}
-					ev = MouseEvent{MouseClick, ev.Point}
-				}
-			}
+			m.Downed[i] = nil
 		}
-		m.Downed = nil
 	}
-
-	if callBack, ok := b.Callbacks[ev.Type]; ok {
-		// defer callback to click.
-		// if both clicks and callbacks to double clicks are set,
-		// it will not be confirmed whether this click is single click
-		// or a first part of double click,
-		// until one more click comes in for a certain period of time is there.
-		if ev.Type == MouseClick {
-			if _, ok := b.Callbacks[MouseClick]; ok {
-				if _, ok := b.Callbacks[MouseDoubleClick]; ok {
-					return true
-				}
-			}
-		}
-		// Do callback
-		callBack(b.Sub)
-		return true
-	}
-
 	return true
 }

@@ -7,10 +7,48 @@ import (
 	"github.com/hajimehoshi/ebiten"
 )
 
+// doubleClickInterval as frame(1/60 second)
+const doubleClickInterval = 15
+
+// MouseButtonMove is move of mouse button
+type MouseButtonMove int
+
+// MouseButtonMove definition
+const (
+	Down MouseButtonMove = 1
+	Up                   = 2
+)
+
 // MouseManager manage status of mouse for ui
 type MouseManager struct {
-	Downed, Clicked *MouseRecord
+	pressed         [3]byte
+	last            MouseEvent
+	Downed, Clicked [3]*MouseRecord
 	Overed          Item
+}
+
+// GetMouseEvent make new mouse event
+func (m *MouseManager) getMouseEvent() (e MouseEvent, updated bool) {
+	moves := [3]MouseButtonMove{}
+	for i := 0; i < 3; i++ {
+		var pressed byte
+		if ebiten.IsMouseButtonPressed(ebiten.MouseButton(i)) {
+			pressed = 1
+		}
+		m.pressed[i] = m.pressed[i]<<1 | pressed
+		moves[i] = MouseButtonMove(m.pressed[i] & 3)
+	}
+
+	x, y := ebiten.CursorPosition()
+	p := image.Point{x, y}
+
+	e = MouseEvent{moves, p}
+
+	if e != m.last {
+		m.last = e
+		return e, true
+	}
+	return e, false
 }
 
 // MouseRecord is record of mouse move and event
@@ -28,26 +66,13 @@ type MouseEventHandler interface {
 
 // MouseEvent is event about mouse action
 type MouseEvent struct {
-	Type  EventType
+	Moves [3]MouseButtonMove
 	Point image.Point
 }
 
 // String for fmt.Stringer interface
-func (ev MouseEvent) String() string {
-	var name string
-	switch ev.Type {
-	case MouseMove:
-		name = "Move"
-	case MouseDown:
-		name = "Down"
-	case MouseUp:
-		name = "Up"
-	case MouseDrag:
-		name = "Drag"
-	case MouseDrop:
-		name = "Drop"
-	}
-	return fmt.Sprintf("%s%s", name, ev.Point)
+func (e MouseEvent) String() string {
+	return fmt.Sprintf("%v%s", e.Moves, e.Point)
 }
 
 // EventType is type of all UI event
@@ -55,43 +80,20 @@ type EventType int
 
 // MouseEvents
 const (
-	MouseMove EventType = iota
-	MouseDown
-	MouseUp
-	MouseDrag
-	MouseDrop
+	LeftDown EventType = iota
+	RightDown
+	MiddleDown
+	LeftUp
+	RightUp
+	MiddleUp
+	LeftClick
+	RightClick
+	MiddleClick
+	LeftDoubleClick
+	RightDoubleClick
+	MiddleDoubleClick
 	MouseOver
 	MouseOut
 	MouseEnter
 	MouseLeave
-	MouseClick
-	MouseDoubleClick
 )
-
-var pressed [3]byte
-var last MouseEvent
-
-// doubleClickInterval as frame(1/60 second)
-const doubleClickInterval = 15
-
-// GetMouseEvent make new mouse event
-func GetMouseEvent() (e MouseEvent, updated bool) {
-	for i := 0; i < 3; i++ {
-		if ebiten.IsMouseButtonPressed(ebiten.MouseButton(i)) {
-			pressed[i] = pressed[i]<<1 | 1
-		} else {
-			pressed[i] = pressed[i]<<1 | 0
-		}
-	}
-	tipe := EventType(pressed[0] & 3)
-
-	x, y := ebiten.CursorPosition()
-	p := image.Point{x, y}
-	e = MouseEvent{tipe, p}
-
-	if e != last {
-		last = e
-		return e, true
-	}
-	return e, false
-}

@@ -10,16 +10,19 @@ import (
 func Update(bg Item) {
 	m.Now++
 	// defered click event callback
-	if m.Clicked != nil {
-		if m.Now-m.Clicked.Frame > doubleClickInterval {
-			if c, ok := m.Clicked.Item.Callbacks[MouseClick]; ok {
-				c(m.Clicked.Item.Sub)
+	for i := 0; i < 3; i++ {
+		click := LeftClick + EventType(i)
+		if m.Clicked[i] != nil {
+			if m.Now-m.Clicked[i].Frame > doubleClickInterval {
+				if c, ok := m.Clicked[i].Item.Callbacks[click]; ok {
+					c(m.Clicked[i].Item.Sub)
+				}
+				m.Clicked[i] = nil
 			}
-			m.Clicked = nil
 		}
 	}
 
-	if ev, ok := GetMouseEvent(); ok {
+	if ev, ok := m.getMouseEvent(); ok {
 		bg.HandleMouseEvent(ev, image.ZP, bg.Rectangle())
 	}
 }

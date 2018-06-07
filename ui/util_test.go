@@ -27,3 +27,12 @@ func TestColorCode(t *testing.T) {
 		}
 	}
 }
+
+func TestEqual(t *testing.T) {
+	put := [3]byte{0, 1, 2}
+	got := put
+	want := [3]byte{0, 1, 2}
+	if got != want {
+		t.Errorf("put %v got %v want %v", put, got, want)
+	}
+}

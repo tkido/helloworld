@@ -12,8 +12,8 @@ func init() {
 	m = &Manager{
 		0,
 		MouseManager{
-			Downed:  nil,
-			Clicked: nil,
+			Downed:  [3]*MouseRecord{},
+			Clicked: [3]*MouseRecord{},
 		},
 	}
 }

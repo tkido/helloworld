@@ -80,22 +80,22 @@ func init() {
 
 	bg = ui.NewBox(screenWidth, screenHeight, color.NRGBA{0x00, 0xff, 0x00, 0xff})
 
-	bg.SetCallback(ui.MouseClick, onClick)
-	bg.SetCallback(ui.MouseDoubleClick, onDoubleClick)
+	bg.SetCallback(ui.RightClick, onClick)
+	bg.SetCallback(ui.RightDoubleClick, onDoubleClick)
 	bg.Add(200, 200, ui.NewBox(200, 200, color.Black))
 
 	box1 := ui.NewBox(200, 200, color.White)
 	for i := -20; i <= 180; i += 100 {
 		for j := -20; j <= 180; j += 100 {
 			box := ui.NewBox(50, 50, color.NRGBA{0xff, 0x00, 0x00, 0xff})
-			box.SetCallback(ui.MouseUp, expand)
+			box.SetCallback(ui.LeftUp, expand)
 			box1.Add(i, j, box)
 		}
 	}
 	bg.Add(100, 100, box1)
 
 	img := ui.NewImage(100, 100, png)
-	img.SetCallback(ui.MouseClick, expand)
+	img.SetCallback(ui.LeftClick, expand)
 	box1.Add(-10, 120, img)
 
 	label := ui.NewLabel(screenWidth, 24, ".fjあいうアイウ愛飢男■★◆Ａｊｆ", normalFont, color.White, color.Black, 24)
