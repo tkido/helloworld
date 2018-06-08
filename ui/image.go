@@ -15,9 +15,8 @@ type Image struct {
 
 // NewImage make new *ui.Image
 func NewImage(w, h int, srcImg image.Image) *Image {
-	r := image.Rect(0, 0, w, h)
-	b := Box{r, nil, nil, nil, []Item{}, Callbacks{}, nil}
-	i := &Image{b, srcImg}
+	b := NewBox(w, h, nil)
+	i := &Image{*b, srcImg}
 	i.Sub = i
 	return i
 }

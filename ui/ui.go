@@ -24,6 +24,12 @@ func Update(bg Item) {
 
 	if ev, ok := m.getMouseEvent(); ok {
 		bg.HandleMouseEvent(ev, image.ZP, bg.Rectangle())
+		for k, v := range m.InItems {
+			if v != m.Now {
+				k.Call(MouseLeave)
+				delete(m.InItems, k)
+			}
+		}
 	}
 }
 

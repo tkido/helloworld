@@ -39,6 +39,25 @@ func expand(i ui.Item) {
 	i.Resize(w+10, h+10)
 }
 
+func onMouseOn(i ui.Item) {
+	fmt.Printf("%s %s\n", i, "MouseOn")
+}
+func onMouseIn(i ui.Item) {
+	fmt.Printf("%s %s\n", i, "MouseIn")
+}
+func onMouseOver(i ui.Item) {
+	fmt.Printf("%s %s\n", i, "MouseOver")
+}
+func onMouseOut(i ui.Item) {
+	fmt.Printf("%s %s\n", i, "MouseOut")
+}
+func onMouseEnter(i ui.Item) {
+	fmt.Printf("%s %s\n", i, "MouseEnter")
+}
+func onMouseLeave(i ui.Item) {
+	fmt.Printf("%s %s\n", i, "MouseLeave")
+}
+
 // Game is status of game
 type Game struct {
 	IsRunning, IsDebugPrint bool
@@ -99,6 +118,18 @@ func init() {
 	box1.Add(-10, 120, img)
 
 	label := ui.NewLabel(screenWidth, 24, ".fjあいうアイウ愛飢男■★◆Ａｊｆ", normalFont, color.White, color.Black, 24)
+	// label.SetCallback(ui.MouseOn, onMouseOn)
+	// label.SetCallback(ui.MouseIn, onMouseIn)
+	label.SetCallback(ui.MouseOut, onMouseOut)
+	label.SetCallback(ui.MouseOver, onMouseOver)
+	label.SetCallback(ui.MouseEnter, onMouseEnter)
+	label.SetCallback(ui.MouseLeave, onMouseLeave)
+	// bg.SetCallback(ui.MouseOn, onMouseOn)
+	// bg.SetCallback(ui.MouseIn, onMouseIn)
+	bg.SetCallback(ui.MouseOut, onMouseOut)
+	bg.SetCallback(ui.MouseOver, onMouseOver)
+	bg.SetCallback(ui.MouseEnter, onMouseEnter)
+	bg.SetCallback(ui.MouseLeave, onMouseLeave)
 	bg.Add(10, 10, label)
 }
 

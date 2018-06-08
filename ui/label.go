@@ -2,7 +2,6 @@ package ui
 
 import (
 	"fmt"
-	"image"
 	"image/color"
 
 	"golang.org/x/image/font"
@@ -21,9 +20,8 @@ type Label struct {
 
 // NewLabel make new *ui.Label
 func NewLabel(w, h int, text string, face font.Face, color, bgColor color.Color, s int) *Label {
-	r := image.Rect(0, 0, w, h)
-	b := Box{r, bgColor, nil, nil, []Item{}, Callbacks{}, nil}
-	l := &Label{b, text, face, color, s}
+	b := NewBox(w, h, bgColor)
+	l := &Label{*b, text, face, color, s}
 	l.Sub = l
 	return l
 }

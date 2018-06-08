@@ -113,56 +113,71 @@ func (b *Box) String() string {
 	return fmt.Sprintf("Box[%s]%s%s", p, b.Rect, ColorCode(b.Color))
 }
 
-func (b *Box) call(t EventType) {
+// Call callback function if it exists
+func (b *Box) Call(t EventType) {
 	if c, ok := b.Callbacks[t]; ok {
 		c(b.Sub)
 	}
+}
+
+func (b *Box) mouseOn() {
+	if m.OnItem != nil && m.OnItem != b.Sub {
+		m.OnItem.Call(MouseOut)
+	}
+	b.Call(MouseOn)
+	if m.OnItem != b.Sub {
+		b.Call(MouseOver)
+	}
+	m.OnItem = b.Sub
+	b.mouseIn()
+}
+
+func (b *Box) mouseIn() {
+	b.Call(MouseIn)
+	if _, ok := m.InItems[b.Sub]; !ok {
+		b.Call(MouseEnter)
+	}
+	m.InItems[b.Sub] = m.Now
 }
 
 // HandleMouseEvent handle mouse event
 func (b *Box) HandleMouseEvent(ev MouseEvent, origin image.Point, clip image.Rectangle) (handled bool) {
 	rect := b.Rect.Add(origin)
 	clip = clip.Intersect(rect)
-	if clip.Empty() {
-		return
-	}
-	// out of range
 	if !ev.Point.In(clip) {
 		return
 	}
-	// children first because they are in front of parent
+	// children are evaluated first in reverse order, because added later one is more front
 	for i := len(b.Children) - 1; 0 <= i; i-- {
-		child := b.Children[i]
-		// children are evaluated in reverse order
-		// because that was added later is more front
-		ok := child.HandleMouseEvent(ev, origin.Add(b.Rect.Min), clip)
-		if ok {
+		handled := b.Children[i].HandleMouseEvent(ev, origin.Add(b.Rect.Min), clip)
+		if handled {
+			b.mouseIn()
 			return true
 		}
 	}
-
 	// handle by myself
+	b.mouseOn()
 	for i := 0; i < 3; i++ {
 		down, up, click, doubleClick := LeftDown+EventType(i), LeftUp+EventType(i), LeftClick+EventType(i), LeftDoubleClick+EventType(i)
 		switch ev.Moves[i] {
 		case Down:
-			b.call(down)
+			b.Call(down)
 			m.Downed[i] = &MouseRecord{b, ev.Point, m.Now}
 		case Up:
-			b.call(up)
+			b.Call(up)
 			if m.Downed[i] != nil && m.Downed[i].Item == b && isCloseEnough(ev.Point, m.Downed[i].Point) {
 				if m.Clicked[i] != nil {
 					if m.Clicked[i].Item == b && m.Now-m.Clicked[i].Frame <= doubleClickInterval && isCloseEnough(ev.Point, m.Clicked[i].Point) {
-						b.call(doubleClick)
+						b.Call(doubleClick)
 						m.Clicked[i] = nil
 					} else {
-						m.Clicked[i].Item.call(click)
+						m.Clicked[i].Item.Call(click)
 						m.Clicked[i] = &MouseRecord{b, ev.Point, m.Now}
 					}
 				} else if _, ok := b.Callbacks[doubleClick]; ok {
 					m.Clicked[i] = &MouseRecord{b, ev.Point, m.Now}
 				} else {
-					b.call(click)
+					b.Call(click)
 				}
 			}
 			m.Downed[i] = nil
