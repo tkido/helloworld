@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"image"
 	"image/color"
 	_ "image/png"
@@ -29,10 +28,10 @@ var (
 )
 
 func onClick(i ui.Item) {
-	fmt.Printf("%s %s\n", i, "clicked!!")
+	log.Printf("%s %s", i, "clicked!!")
 }
 func onDoubleClick(i ui.Item) {
-	fmt.Printf("%s %s\n", i, "double clicked!!!!")
+	log.Printf("%s %s", i, "double clicked!!!!")
 }
 func expand(i ui.Item) {
 	w, h := i.Size()
@@ -40,22 +39,22 @@ func expand(i ui.Item) {
 }
 
 func onMouseOn(i ui.Item) {
-	fmt.Printf("%s %s\n", i, "MouseOn")
+	log.Printf("%s %s", i, "MouseOn")
 }
 func onMouseIn(i ui.Item) {
-	fmt.Printf("%s %s\n", i, "MouseIn")
+	log.Printf("%s %s", i, "MouseIn")
 }
 func onMouseOver(i ui.Item) {
-	fmt.Printf("%s %s\n", i, "MouseOver")
+	log.Printf("%s %s", i, "MouseOver")
 }
 func onMouseOut(i ui.Item) {
-	fmt.Printf("%s %s\n", i, "MouseOut")
+	log.Printf("%s %s", i, "MouseOut")
 }
 func onMouseEnter(i ui.Item) {
-	fmt.Printf("%s %s\n", i, "MouseEnter")
+	log.Printf("%s %s", i, "MouseEnter")
 }
 func onMouseLeave(i ui.Item) {
-	fmt.Printf("%s %s\n", i, "MouseLeave")
+	log.Printf("%s %s", i, "MouseLeave")
 }
 
 // Game is status of game

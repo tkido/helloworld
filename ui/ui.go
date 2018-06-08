@@ -9,24 +9,27 @@ import (
 // Update ui
 func Update(bg Item) {
 	m.Now++
-	// defered click event callback
-	for i := 0; i < 3; i++ {
-		click := LeftClick + EventType(i)
-		if m.Clicked[i] != nil {
-			if m.Now-m.Clicked[i].Frame > doubleClickInterval {
-				m.Clicked[i].Item.Call(click)
-				m.Clicked[i] = nil
-			}
-		}
-	}
 	// mouse control
 	if ev, ok := m.getMouseEvent(); ok {
-		bg.HandleMouseEvent(ev, image.ZP, bg.Rectangle())
+		if handled := bg.HandleMouseEvent(ev, image.ZP, bg.Rectangle()); !handled {
+			if m.OnItem != nil {
+				m.OnItem.Call(MouseOut)
+				m.OnItem = nil
+			}
+		}
 		for k, v := range m.InItems {
 			if v != m.Now {
 				k.Call(MouseLeave)
 				delete(m.InItems, k)
 			}
+		}
+	}
+	// defered click event callback
+	for i := 0; i < 3; i++ {
+		if m.Clicked[i] != nil && m.Now-m.Clicked[i].Frame > doubleClickInterval {
+			click := LeftClick + EventType(i)
+			m.Clicked[i].Item.Call(click)
+			m.Clicked[i] = nil
 		}
 	}
 }

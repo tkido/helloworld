@@ -165,8 +165,10 @@ func (b *Box) HandleMouseEvent(ev MouseEvent, origin image.Point, clip image.Rec
 			m.Downed[i] = &MouseRecord{b, ev.Point, m.Now}
 		case Up:
 			b.Call(up)
+			// isClick?
 			if m.Downed[i] != nil && m.Downed[i].Item == b && isCloseEnough(ev.Point, m.Downed[i].Point) {
 				if m.Clicked[i] != nil {
+					// isDoubleClick?
 					if m.Clicked[i].Item == b && m.Now-m.Clicked[i].Frame <= doubleClickInterval && isCloseEnough(ev.Point, m.Clicked[i].Point) {
 						b.Call(doubleClick)
 						m.Clicked[i] = nil
