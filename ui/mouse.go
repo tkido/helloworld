@@ -13,7 +13,8 @@ type MouseButtonMove int
 
 // MouseButtonMove definition
 const (
-	Down MouseButtonMove = 1
+	None MouseButtonMove = 0
+	Down                 = 1
 	Up                   = 2
 )
 
