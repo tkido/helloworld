@@ -43,13 +43,7 @@ func (m *MouseManager) getMouseEvent() (e MouseEvent, updated bool) {
 			pressed = 1
 		}
 		m.pressed[i] = m.pressed[i]<<1 | pressed
-		move := MouseButtonMove(m.pressed[i] & 3)
-		switch move {
-		case Down, Up:
-		default:
-			move = None
-		}
-		moves[i] = move
+		moves[i] = MouseButtonMove(m.pressed[i] & 3)
 	}
 	x, y := ebiten.CursorPosition()
 	p := image.Point{x, y}

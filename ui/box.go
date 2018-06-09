@@ -149,8 +149,7 @@ func (b *Box) HandleMouseEvent(ev MouseEvent, origin image.Point, clip image.Rec
 	}
 	// children are evaluated first in reverse order, because added later one is more front
 	for i := len(b.Children) - 1; 0 <= i; i-- {
-		handled := b.Children[i].HandleMouseEvent(ev, origin.Add(b.Rect.Min), clip)
-		if handled {
+		if handled := b.Children[i].HandleMouseEvent(ev, origin.Add(b.Rect.Min), clip); handled {
 			b.mouseIn()
 			return true
 		}

@@ -13,9 +13,10 @@ type MouseButtonMove int
 
 // MouseButtonMove definition
 const (
-	None MouseButtonMove = 0
-	Down                 = 1
-	Up                   = 2
+	None    MouseButtonMove = 0
+	Down                    = 1
+	Up                      = 2
+	PRESSED                 = 3
 )
 
 // MouseRecord is record of mouse move and event
