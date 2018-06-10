@@ -22,7 +22,14 @@ type Box struct {
 // NewBox make new Box
 func NewBox(w, h int, c color.Color) *Box {
 	r := image.Rect(0, 0, w, h)
-	b := &Box{r, c, nil, nil, []Item{}, Callbacks{}, nil}
+	b := &Box{
+		Rect:             r,
+		Color:            c,
+		Image:            nil,
+		DrawImageOptions: nil,
+		Children:         []Item{},
+		Callbacks:        Callbacks{},
+		Sub:              nil}
 	b.Sub = b
 	return b
 }
@@ -73,38 +80,43 @@ func (b *Box) Size() (w, h int) {
 }
 
 // Draw draw box
-func (b *Box) Draw(screen *ebiten.Image, origin image.Point, clip image.Rectangle) {
+func (b *Box) Draw(screen *ebiten.Image, opts ebiten.DrawImageOptions, origin image.Point, clip image.Rectangle) {
 	rect := b.Rect.Add(origin)
 	clip = clip.Intersect(rect)
 	if clip.Empty() {
 		return
 	}
 
-	b.draw(screen, rect, clip)
+	if b.DrawImageOptions != nil {
+		opts.GeoM.Concat(b.DrawImageOptions.GeoM)
+		opts.ColorM.Concat(b.DrawImageOptions.ColorM)
+		opts.CompositeMode = b.DrawImageOptions.CompositeMode
+		opts.Filter = b.DrawImageOptions.Filter
+	}
+	b.draw(screen, opts, rect, clip)
 
 	for _, c := range b.Children {
-		c.Draw(screen, origin.Add(b.Rect.Min), clip)
+		c.Draw(screen, opts, origin.Add(b.Rect.Min), clip)
 	}
 }
 
 // draw myself
-func (b *Box) draw(screen *ebiten.Image, rect, clip image.Rectangle) {
+func (b *Box) draw(screen *ebiten.Image, opts ebiten.DrawImageOptions, rect, clip image.Rectangle) {
 	if b.Image == nil {
 		b.Sub.Reflesh()
 	}
 	if b.Image == nil {
 		return
 	}
-	op := &ebiten.DrawImageOptions{}
 	p := rect.Min
 	// clipped part of image
 	if clip != rect {
 		d := clip.Min.Sub(rect.Min)
-		op.SourceRect = &image.Rectangle{d, d.Add(clip.Size())}
+		opts.SourceRect = &image.Rectangle{d, d.Add(clip.Size())}
 		p = p.Add(d)
 	}
-	op.GeoM.Translate(float64(p.X), float64(p.Y))
-	screen.DrawImage(b.Image, op)
+	opts.GeoM.Translate(float64(p.X), float64(p.Y))
+	screen.DrawImage(b.Image, &opts)
 }
 
 // String for fmt.Stringer interface

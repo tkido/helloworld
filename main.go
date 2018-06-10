@@ -6,6 +6,7 @@ import (
 	_ "image/png"
 	"io/ioutil"
 	"log"
+	"math"
 
 	"bitbucket.org/tkido/helloworld/ui"
 	"github.com/golang/freetype/truetype"
@@ -102,7 +103,13 @@ func init() {
 	bg.SetCallback(ui.RightDoubleClick, onDoubleClick)
 	bg.Add(200, 200, ui.NewBox(200, 200, color.Black))
 
-	box1 := ui.NewBox(200, 200, color.White)
+	box1 := ui.NewBox(200, 200, color.NRGBA{0x00, 0xff, 0xff, 0xff})
+	opts := &ebiten.DrawImageOptions{}
+	// opts.GeoM.Scale(2.0, 2.0)
+	opts.ColorM.RotateHue(math.Pi)
+	// opts.GeoM.Rotate(math.Pi / 3)
+	box1.DrawImageOptions = opts
+
 	for i := -20; i <= 180; i += 100 {
 		for j := -20; j <= 180; j += 100 {
 			box := ui.NewBox(50, 50, color.NRGBA{0xff, 0x00, 0x00, 0xff})

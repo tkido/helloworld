@@ -9,7 +9,7 @@ import (
 // Item is ebiten UI item
 type Item interface {
 	Call(EventType)
-	Draw(screen *ebiten.Image, origin image.Point, clip image.Rectangle)
+	Draw(screen *ebiten.Image, opts ebiten.DrawImageOptions, origin image.Point, clip image.Rectangle)
 	Reflesh()
 	Move(x, y int)
 	Position() (x, y int)

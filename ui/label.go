@@ -9,6 +9,12 @@ import (
 	"github.com/hajimehoshi/ebiten/text"
 )
 
+// Texter has internal text as string
+type Texter interface {
+	SetText(text string)
+	GetText() (text string)
+}
+
 // Label is simple box
 type Label struct {
 	Box
