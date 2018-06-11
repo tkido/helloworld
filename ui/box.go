@@ -93,6 +93,10 @@ func (b *Box) Size() (w, h int) {
 	return s.X, s.Y
 }
 
+func copyDrawImageOptions(op ebiten.DrawImageOptions) ebiten.DrawImageOptions {
+	return op
+}
+
 // Draw draw box
 func (b *Box) Draw(screen *ebiten.Image) {
 	if b.Dirty {
@@ -104,10 +108,8 @@ func (b *Box) Draw(screen *ebiten.Image) {
 	}
 	op := &ebiten.DrawImageOptions{}
 	if o := b.DrawImageOptions; o != nil {
-		op.GeoM.Concat(o.GeoM)
-		op.ColorM.Concat(o.ColorM)
-		op.CompositeMode = o.CompositeMode
-		op.Filter = o.Filter
+		copied := copyDrawImageOptions(*o)
+		op = &copied
 	}
 	x, y := b.Position()
 	op.GeoM.Translate(float64(x), float64(y))

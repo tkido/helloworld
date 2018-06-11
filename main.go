@@ -6,7 +6,6 @@ import (
 	_ "image/png"
 	"io/ioutil"
 	"log"
-	"math"
 
 	"bitbucket.org/tkido/helloworld/ui"
 	"github.com/golang/freetype/truetype"
@@ -94,7 +93,7 @@ func init() {
 		DPI:     dpi,
 		Hinting: font.HintingFull,
 	})
-	// game
+
 	game = Game{true, false}
 
 	bg = ui.NewBox(screenWidth, screenHeight, color.NRGBA{0x00, 0xff, 0x00, 0xff})
@@ -106,11 +105,11 @@ func init() {
 	box1 := ui.NewBox(200, 200, color.NRGBA{0x00, 0xff, 0xff, 0xff})
 	op := &ebiten.DrawImageOptions{}
 	// op.GeoM.Scale(2.0, 2.0)
-	op.ColorM.RotateHue(math.Pi)
-	w, h := box1.Size()
-	op.GeoM.Translate(-float64(w)/2, -float64(h)/2)
-	op.GeoM.Rotate(math.Pi / 5)
-	op.GeoM.Translate(float64(w)/2, float64(h)/2)
+	// op.ColorM.RotateHue(math.Pi)
+	// w, h := box1.Size()
+	// op.GeoM.Translate(-float64(w)/2, -float64(h)/2)
+	// op.GeoM.Rotate(math.Pi / 5)
+	// op.GeoM.Translate(float64(w)/2, float64(h)/2)
 	box1.DrawImageOptions = op
 	for i := -20; i <= 180; i += 100 {
 		for j := -20; j <= 180; j += 100 {
@@ -123,6 +122,11 @@ func init() {
 
 	img := ui.NewImage(100, 100, png)
 	img.SetCallback(ui.LeftClick, expand)
+	img.SetCallback(ui.RightClick, func(i ui.Item) {
+		w, h := i.Size()
+		i.Resize(w-10, h-10)
+	})
+
 	box1.Add(-10, 120, img)
 
 	label := ui.NewLabel(screenWidth, 24, ".fjあいうアイウ愛飢男■★◆Ａｊｆ", normalFont, color.White, color.Black, 24)
