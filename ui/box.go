@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"image"
 	"image/color"
-	"log"
 
 	"github.com/hajimehoshi/ebiten"
 )
@@ -52,7 +51,6 @@ func (b *Box) Reflesh() {
 
 // SetDirty set dirty
 func (b *Box) SetDirty() {
-	log.Printf("%s.SetDirty", b.Sub)
 	b.Dirty = true
 	if b.Parent != nil {
 		b.Parent.SetDirty()
@@ -80,11 +78,6 @@ func (b *Box) Move(x, y int) {
 func (b *Box) Position() (x, y int) {
 	min := b.Rect.Min
 	return min.X, min.Y
-}
-
-// Rectangle return Rectangle
-func (b *Box) Rectangle() image.Rectangle {
-	return b.Rect
 }
 
 // Resize resize item

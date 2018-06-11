@@ -14,7 +14,6 @@ type Item interface {
 	SetDirty()
 	Move(x, y int)
 	Position() (x, y int)
-	Rectangle() image.Rectangle
 	Resize(w, h int)
 	Size() (w, h int)
 	Add(x, y int, item Item)

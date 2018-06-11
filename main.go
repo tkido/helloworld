@@ -104,12 +104,14 @@ func init() {
 	bg.Add(300, 200, ui.NewBox(200, 200, color.Black))
 
 	box1 := ui.NewBox(200, 200, color.NRGBA{0x00, 0xff, 0xff, 0xff})
-	opts := &ebiten.DrawImageOptions{}
-	// opts.GeoM.Scale(2.0, 2.0)
-	// opts.ColorM.RotateHue(math.Pi)
-	opts.GeoM.Rotate(math.Pi / 5)
-	box1.DrawImageOptions = opts
-
+	op := &ebiten.DrawImageOptions{}
+	// op.GeoM.Scale(2.0, 2.0)
+	op.ColorM.RotateHue(math.Pi)
+	w, h := box1.Size()
+	op.GeoM.Translate(-float64(w)/2, -float64(h)/2)
+	op.GeoM.Rotate(math.Pi / 5)
+	op.GeoM.Translate(float64(w)/2, float64(h)/2)
+	box1.DrawImageOptions = op
 	for i := -20; i <= 180; i += 100 {
 		for j := -20; j <= 180; j += 100 {
 			box := ui.NewBox(50, 50, color.NRGBA{0xff, 0x00, 0x00, 0xff})

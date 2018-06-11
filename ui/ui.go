@@ -2,6 +2,7 @@ package ui
 
 import (
 	"image"
+	"math"
 
 	"github.com/hajimehoshi/ebiten"
 )
@@ -11,7 +12,7 @@ func Update(bg Item) {
 	m.Now++
 	// mouse control
 	if ev, ok := m.getMouseEvent(); ok {
-		if handled := bg.HandleMouseEvent(ev, image.ZP, bg.Rectangle()); !handled {
+		if handled := bg.HandleMouseEvent(ev, image.ZP, image.Rect(0, 0, math.MaxInt64, math.MaxInt32)); !handled {
 			if m.OnItem != nil {
 				m.OnItem.Call(MouseOut)
 				m.OnItem = nil
