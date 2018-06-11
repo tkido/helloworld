@@ -51,6 +51,9 @@ func (b *Box) Reflesh() {
 
 // SetDirty set dirty
 func (b *Box) SetDirty() {
+	if b.Dirty == true {
+		return
+	}
 	b.Dirty = true
 	if b.Parent != nil {
 		b.Parent.SetDirty()

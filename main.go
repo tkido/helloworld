@@ -138,6 +138,12 @@ func init() {
 	label.SetCallback(ui.MouseLeave, onMouseLeave)
 	// bg.SetCallback(ui.MouseOn, onMouseOn)
 	// bg.SetCallback(ui.MouseIn, onMouseIn)
+	label.SetCallback(ui.LeftClick, func(i ui.Item) {
+		if l, ok := i.(*ui.Label); ok {
+			l.SetText("テスト")
+		}
+	})
+
 	bg.SetCallback(ui.MouseOut, onMouseOut)
 	bg.SetCallback(ui.MouseOver, onMouseOver)
 	bg.SetCallback(ui.MouseEnter, onMouseEnter)

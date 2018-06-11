@@ -24,6 +24,17 @@ type Label struct {
 	FontSize  int
 }
 
+// SetText set internal text string
+func (l *Label) SetText(s string) {
+	l.Text = s
+	l.SetDirty()
+}
+
+// GetText get internal text string
+func (l *Label) GetText() string {
+	return l.Text
+}
+
 // NewLabel make new *ui.Label
 func NewLabel(w, h int, text string, face font.Face, color, bgColor color.Color, s int) *Label {
 	b := NewBox(w, h, bgColor)
