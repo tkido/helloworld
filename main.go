@@ -101,13 +101,13 @@ func init() {
 
 	bg.SetCallback(ui.RightClick, onClick)
 	bg.SetCallback(ui.RightDoubleClick, onDoubleClick)
-	bg.Add(200, 200, ui.NewBox(200, 200, color.Black))
+	bg.Add(300, 200, ui.NewBox(200, 200, color.Black))
 
 	box1 := ui.NewBox(200, 200, color.NRGBA{0x00, 0xff, 0xff, 0xff})
 	opts := &ebiten.DrawImageOptions{}
 	// opts.GeoM.Scale(2.0, 2.0)
-	opts.ColorM.RotateHue(math.Pi)
-	// opts.GeoM.Rotate(math.Pi / 3)
+	// opts.ColorM.RotateHue(math.Pi)
+	opts.GeoM.Rotate(math.Pi / 5)
 	box1.DrawImageOptions = opts
 
 	for i := -20; i <= 180; i += 100 {
@@ -117,7 +117,7 @@ func init() {
 			box1.Add(i, j, box)
 		}
 	}
-	bg.Add(100, 100, box1)
+	bg.Add(200, 100, box1)
 
 	img := ui.NewImage(100, 100, png)
 	img.SetCallback(ui.LeftClick, expand)

@@ -9,8 +9,9 @@ import (
 // Item is ebiten UI item
 type Item interface {
 	Call(EventType)
-	Draw(screen *ebiten.Image, opts ebiten.DrawImageOptions, origin image.Point, clip image.Rectangle)
+	Draw(screen *ebiten.Image)
 	Reflesh()
+	SetDirty()
 	Move(x, y int)
 	Position() (x, y int)
 	Rectangle() image.Rectangle
@@ -19,4 +20,5 @@ type Item interface {
 	Add(x, y int, item Item)
 	HandleMouseEvent(ev MouseEvent, origin image.Point, clip image.Rectangle) (handled bool)
 	String() string
+	SetParent(i Item)
 }

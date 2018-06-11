@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"image"
 	"image/color"
+	"log"
 
 	"github.com/hajimehoshi/ebiten"
 )
@@ -14,6 +15,8 @@ type Box struct {
 	Color            color.Color
 	Image            *ebiten.Image
 	DrawImageOptions *ebiten.DrawImageOptions
+	Dirty            bool
+	Parent           Item
 	Children         []Item
 	Callbacks
 	Sub Item
@@ -26,28 +29,46 @@ func NewBox(w, h int, c color.Color) *Box {
 		Rect:             r,
 		Color:            c,
 		Image:            nil,
+		Dirty:            true,
 		DrawImageOptions: nil,
+		Parent:           nil,
 		Children:         []Item{},
 		Callbacks:        Callbacks{},
-		Sub:              nil}
+		Sub:              nil,
+	}
 	b.Sub = b
 	return b
 }
 
 // Reflesh updates internal *ebiten.Image
 func (b *Box) Reflesh() {
-	if b.Color == nil || b.Color == color.Transparent {
-		return
+	if b.Color == nil {
+		b.Color = color.Transparent
 	}
 	w, h := b.Size()
 	b.Image, _ = ebiten.NewImage(w, h, ebiten.FilterDefault)
 	b.Image.Fill(b.Color)
 }
 
+// SetDirty set dirty
+func (b *Box) SetDirty() {
+	log.Printf("%s.SetDirty", b.Sub)
+	b.Dirty = true
+	if b.Parent != nil {
+		b.Parent.SetDirty()
+	}
+}
+
 // Add append child item to item
 func (b *Box) Add(x, y int, c Item) {
 	c.Move(x, y)
+	c.SetParent(b.Sub)
 	b.Children = append(b.Children, c)
+}
+
+// SetParent set parent
+func (b *Box) SetParent(i Item) {
+	b.Parent = i
 }
 
 // Move move item. (x, y) is relative position from parent.
@@ -70,7 +91,7 @@ func (b *Box) Rectangle() image.Rectangle {
 func (b *Box) Resize(w, h int) {
 	x, y := b.Rect.Min.X, b.Rect.Min.Y
 	b.Rect = image.Rect(x, y, x+w, y+h)
-	b.Image = nil
+	b.SetDirty()
 }
 
 // Size get size of item
@@ -80,43 +101,24 @@ func (b *Box) Size() (w, h int) {
 }
 
 // Draw draw box
-func (b *Box) Draw(screen *ebiten.Image, opts ebiten.DrawImageOptions, origin image.Point, clip image.Rectangle) {
-	rect := b.Rect.Add(origin)
-	clip = clip.Intersect(rect)
-	if clip.Empty() {
-		return
-	}
-
-	if b.DrawImageOptions != nil {
-		opts.GeoM.Concat(b.DrawImageOptions.GeoM)
-		opts.ColorM.Concat(b.DrawImageOptions.ColorM)
-		opts.CompositeMode = b.DrawImageOptions.CompositeMode
-		opts.Filter = b.DrawImageOptions.Filter
-	}
-	b.draw(screen, opts, rect, clip)
-
-	for _, c := range b.Children {
-		c.Draw(screen, opts, origin.Add(b.Rect.Min), clip)
-	}
-}
-
-// draw myself
-func (b *Box) draw(screen *ebiten.Image, opts ebiten.DrawImageOptions, rect, clip image.Rectangle) {
-	if b.Image == nil {
+func (b *Box) Draw(screen *ebiten.Image) {
+	if b.Dirty {
 		b.Sub.Reflesh()
+		b.Dirty = false
+		for _, c := range b.Children {
+			c.Draw(b.Image)
+		}
 	}
-	if b.Image == nil {
-		return
+	op := &ebiten.DrawImageOptions{}
+	if o := b.DrawImageOptions; o != nil {
+		op.GeoM.Concat(o.GeoM)
+		op.ColorM.Concat(o.ColorM)
+		op.CompositeMode = o.CompositeMode
+		op.Filter = o.Filter
 	}
-	p := rect.Min
-	// clipped part of image
-	if clip != rect {
-		d := clip.Min.Sub(rect.Min)
-		opts.SourceRect = &image.Rectangle{d, d.Add(clip.Size())}
-		p = p.Add(d)
-	}
-	opts.GeoM.Translate(float64(p.X), float64(p.Y))
-	screen.DrawImage(b.Image, &opts)
+	x, y := b.Position()
+	op.GeoM.Translate(float64(x), float64(y))
+	screen.DrawImage(b.Image, op)
 }
 
 // String for fmt.Stringer interface

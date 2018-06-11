@@ -36,5 +36,5 @@ func Update(bg Item) {
 
 // Draw ui
 func Draw(screen *ebiten.Image, bg Item) {
-	bg.Draw(screen, ebiten.DrawImageOptions{}, image.ZP, bg.Rectangle())
+	bg.Draw(screen)
 }
