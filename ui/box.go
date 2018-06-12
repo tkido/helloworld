@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"image"
 	"image/color"
+	"log"
 
 	"github.com/hajimehoshi/ebiten"
 )
@@ -128,6 +129,7 @@ func (b *Box) String() string {
 
 // Call callback function if it exists
 func (b *Box) Call(t EventType) {
+	log.Printf("%s %s", b.Sub, t)
 	if c, ok := b.Callbacks[t]; ok {
 		c(b.Sub)
 	}

@@ -42,28 +42,3 @@ type MouseEvent struct {
 func (e MouseEvent) String() string {
 	return fmt.Sprintf("%v%s", e.Moves, e.Point)
 }
-
-// EventType is type of all UI event
-type EventType int
-
-// MouseEvents
-const (
-	LeftDown EventType = iota
-	RightDown
-	MiddleDown
-	LeftUp
-	RightUp
-	MiddleUp
-	LeftClick
-	RightClick
-	MiddleClick
-	LeftDoubleClick
-	RightDoubleClick
-	MiddleDoubleClick
-	MouseOn
-	MouseOver
-	MouseOut
-	MouseIn
-	MouseEnter
-	MouseLeave
-)
