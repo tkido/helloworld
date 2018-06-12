@@ -23,9 +23,8 @@ type Box struct {
 
 // NewBox make new Box
 func NewBox(w, h int, c color.Color) *Box {
-	r := image.Rect(0, 0, w, h)
 	b := &Box{
-		Rect:             r,
+		Rect:             image.Rect(0, 0, w, h),
 		Color:            c,
 		Image:            nil,
 		Dirty:            true,
@@ -62,9 +61,9 @@ func (b *Box) SetDirty() {
 
 // Add append child item to item
 func (b *Box) Add(x, y int, c Item) {
-	c.Move(x, y)
 	c.SetParent(b.Sub)
 	b.Children = append(b.Children, c)
+	c.Move(x, y)
 }
 
 // SetParent set parent
@@ -74,7 +73,9 @@ func (b *Box) SetParent(i Item) {
 
 // Move move item. (x, y) is relative position from parent.
 func (b *Box) Move(x, y int) {
-	b.Rect = b.Rect.Add(image.Point{x, y})
+	w, h := b.Size()
+	b.Rect = image.Rect(x, y, x+w, y+h)
+	b.Parent.SetDirty()
 }
 
 // Position return relative position from parent Item

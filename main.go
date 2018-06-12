@@ -25,6 +25,7 @@ var (
 	game       Game
 	bg         *ui.Box
 	normalFont font.Face
+	count      int
 )
 
 func onClick(i ui.Item) {
@@ -122,10 +123,6 @@ func init() {
 
 	img := ui.NewImage(100, 100, png)
 	img.SetCallback(ui.LeftClick, expand)
-	img.SetCallback(ui.RightClick, func(i ui.Item) {
-		w, h := i.Size()
-		i.Resize(w-10, h-10)
-	})
 
 	box1.Add(-10, 120, img)
 
@@ -138,10 +135,10 @@ func init() {
 	label.SetCallback(ui.MouseLeave, onMouseLeave)
 	// bg.SetCallback(ui.MouseOn, onMouseOn)
 	// bg.SetCallback(ui.MouseIn, onMouseIn)
-	label.SetCallback(ui.LeftClick, func(i ui.Item) {
-		if l, ok := i.(*ui.Label); ok {
-			l.SetText("テスト")
-		}
+
+	img.SetCallback(ui.RightClick, func(i ui.Item) {
+		x, y := i.Position()
+		i.Move(x+10, y)
 	})
 
 	bg.SetCallback(ui.MouseOut, onMouseOut)
