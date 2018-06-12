@@ -18,20 +18,22 @@ func init() {
 	m = &Manager{
 		0,
 		MouseManager{
-			Downed:  [3]*MouseRecord{},
-			Clicked: [3]*MouseRecord{},
-			InItems: map[Item]int{},
+			Downed:              [3]*MouseRecord{},
+			Clicked:             [3]*MouseRecord{},
+			InItems:             map[Item]int{},
+			DoubleClickInterval: 15,
 		},
 	}
 }
 
 // MouseManager manage status of mouse for ui
 type MouseManager struct {
-	pressed         [3]byte
-	last            MouseEvent
-	Downed, Clicked [3]*MouseRecord
-	OnItem          Item
-	InItems         map[Item]int
+	pressed             [3]byte
+	last                MouseEvent
+	Downed, Clicked     [3]*MouseRecord
+	OnItem              Item
+	InItems             map[Item]int
+	DoubleClickInterval int // max interval recognized as DoubleClick. Unit is frame(1/60 second)
 }
 
 // GetMouseEvent make new mouse event

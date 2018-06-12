@@ -27,7 +27,7 @@ func Update(bg Item) {
 	}
 	// defered click event callback
 	for i := 0; i < 3; i++ {
-		if m.Clicked[i] != nil && m.Now-m.Clicked[i].Frame > doubleClickInterval {
+		if m.Clicked[i] != nil && m.Now-m.Clicked[i].Frame > m.DoubleClickInterval {
 			click := LeftClick + EventType(i)
 			m.Clicked[i].Item.Call(click)
 			m.Clicked[i] = nil

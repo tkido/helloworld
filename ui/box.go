@@ -162,7 +162,7 @@ func (b *Box) HandleMouseEvent(ev MouseEvent, origin image.Point, clip image.Rec
 	if !ev.Point.In(clip) {
 		return
 	}
-	// children are evaluated first in reverse order, because added later one is more front
+	// at first, children are evaluated in reverse order. because child added later is at more front
 	for i := len(b.Children) - 1; 0 <= i; i-- {
 		if handled := b.Children[i].HandleMouseEvent(ev, origin.Add(b.Rect.Min), clip); handled {
 			b.mouseIn()
@@ -183,7 +183,7 @@ func (b *Box) HandleMouseEvent(ev MouseEvent, origin image.Point, clip image.Rec
 			if m.Downed[i] != nil && m.Downed[i].Item == b && isCloseEnough(ev.Point, m.Downed[i].Point) {
 				if m.Clicked[i] != nil {
 					// isDoubleClick?
-					if m.Clicked[i].Item == b && m.Now-m.Clicked[i].Frame <= doubleClickInterval && isCloseEnough(ev.Point, m.Clicked[i].Point) {
+					if m.Clicked[i].Item == b && m.Now-m.Clicked[i].Frame <= m.DoubleClickInterval && isCloseEnough(ev.Point, m.Clicked[i].Point) {
 						b.Call(doubleClick)
 						m.Clicked[i] = nil
 					} else {

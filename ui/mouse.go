@@ -5,9 +5,6 @@ import (
 	"image"
 )
 
-// doubleClickInterval as frame(1/60 second)
-const doubleClickInterval = 15
-
 // MouseButtonMove is move of mouse button
 type MouseButtonMove int
 
@@ -16,7 +13,7 @@ const (
 	None    MouseButtonMove = 0
 	Down                    = 1
 	Up                      = 2
-	PRESSED                 = 3
+	Pressed                 = 3
 )
 
 // MouseRecord is record of mouse move and event
