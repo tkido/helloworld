@@ -46,8 +46,13 @@ func NewLabel(w, h int, text string, face font.Face, color, bgColor color.Color,
 // Reflesh updates internal *ebiten.Image
 func (l *Label) Reflesh() {
 	l.Box.Reflesh()
-	_, h := l.Size()
-	text.Draw(l.Image, l.Text, l.Face, 0, h-3, l.FontColor)
+	// _, h := l.Size()
+	rect, advance := font.BoundString(l.Face, l.Text)
+	fmt.Println(l.Face.GlyphBounds('.'))
+	fmt.Println(rect)
+	fmt.Println(advance)
+
+	text.Draw(l.Image, l.Text, l.Face, 0, l.FontSize, l.FontColor)
 	// for _, r := range l.Text {
 	// 	s := fmt.Sprint(l.Face.GlyphBounds(r))
 	// 	fmt.Printf("%s:%s\n", string(r), s)

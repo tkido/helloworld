@@ -126,7 +126,8 @@ func init() {
 
 	box1.Add(-10, 120, img)
 
-	label := ui.NewLabel(screenWidth, 24, ".fjあいうアイウ愛飢男■★◆Ａｊｆ", normalFont, color.White, color.Black, 24)
+	label := ui.NewLabel(screenWidth, 30, ".fjあいうアイウ愛飢男■★◆Ａｊｆ", normalFont, color.White, color.Black, 24)
+	label2 := ui.NewLabel(screenWidth, 30, ".fjあいうアイウ愛飢男■★◆Ａｊｆ", normalFont, color.White, color.Black, 24)
 	// label.SetCallback(ui.MouseOn, onMouseOn)
 	// label.SetCallback(ui.MouseIn, onMouseIn)
 	label.SetCallback(ui.MouseOut, onMouseOut)
@@ -146,6 +147,7 @@ func init() {
 	bg.SetCallback(ui.MouseEnter, onMouseEnter)
 	bg.SetCallback(ui.MouseLeave, onMouseLeave)
 	bg.Add(10, 10, label)
+	bg.Add(10, 40, label2)
 }
 
 func control(screen *ebiten.Image) (err error) {

@@ -41,12 +41,11 @@ func NewBox(w, h int, c color.Color) *Box {
 
 // Reflesh updates internal *ebiten.Image
 func (b *Box) Reflesh() {
-	if b.Color == nil {
-		b.Color = color.Transparent
-	}
 	w, h := b.Size()
 	b.Image, _ = ebiten.NewImage(w, h, ebiten.FilterDefault)
-	b.Image.Fill(b.Color)
+	if b.Color != nil && b.Color != color.Transparent {
+		b.Image.Fill(b.Color)
+	}
 }
 
 // SetDirty set dirty
