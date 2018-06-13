@@ -127,7 +127,7 @@ func init() {
 	box1.Add(-10, 120, img)
 
 	label := ui.NewLabel(screenWidth, 30, ".fjあいうアイウ愛飢男■★◆Ａｊｆ", normalFont, color.White, color.Black, 24)
-	label2 := ui.NewLabel(screenWidth, 30, ".fjあいうアイウ愛飢男■★◆Ａｊｆ", normalFont, color.White, color.Black, 24)
+	label2 := ui.NewLabel(screenWidth, 30, ".fjあいうアイウ愛飢男■★◆Ａｊｆ", normalFont, color.White, nil, 24)
 	// label.SetCallback(ui.MouseOn, onMouseOn)
 	// label.SetCallback(ui.MouseIn, onMouseIn)
 	label.SetCallback(ui.MouseOut, onMouseOut)
