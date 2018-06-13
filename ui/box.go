@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"image"
 	"image/color"
-	"log"
 
 	"github.com/hajimehoshi/ebiten"
 )
@@ -98,6 +97,13 @@ func (b *Box) Size() (w, h int) {
 }
 
 func copyDrawImageOptions(op ebiten.DrawImageOptions) ebiten.DrawImageOptions {
+	if op.SourceRect != nil {
+		// log.Printf("%p", op.SourceRect)
+		sourceRect := *op.SourceRect
+		op.SourceRect = &sourceRect
+		// log.Printf("%p", op.SourceRect)
+		// log.Printf("ok?")
+	}
 	return op
 }
 
@@ -120,7 +126,7 @@ func (b *Box) Draw(screen *ebiten.Image) {
 	screen.DrawImage(b.Image, op)
 }
 
-// String for fmt.Stringer interface
+// String for fmt.Stringer
 func (b *Box) String() string {
 	p := fmt.Sprintf("%p", b)[7:11]
 	return fmt.Sprintf("Box[%s]%s%s", p, b.Rect, ColorCode(b.Color))
@@ -128,7 +134,7 @@ func (b *Box) String() string {
 
 // Call callback function if it exists
 func (b *Box) Call(t EventType) {
-	log.Printf("%s %s", b.Sub, t)
+	// log.Printf("%s %s", b.Sub, t)
 	if c, ok := b.Callbacks[t]; ok {
 		c(b.Sub)
 	}
