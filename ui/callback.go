@@ -1,7 +1,7 @@
 package ui
 
 // Callback is callback function on event
-type Callback func(i Item)
+type Callback interface{}
 
 // Callbacks keep callback functions
 type Callbacks map[EventType]Callback

@@ -1,11 +1,13 @@
 package main
 
 import (
+	"fmt"
 	"image"
 	"image/color"
 	_ "image/png"
 	"io/ioutil"
 	"log"
+	"reflect"
 
 	"bitbucket.org/tkido/helloworld/ui"
 	"github.com/golang/freetype/truetype"
@@ -99,7 +101,14 @@ func init() {
 
 	bg = ui.NewBox(screenWidth, screenHeight, color.NRGBA{0x00, 0xff, 0x00, 0xff})
 
-	bg.SetCallback(ui.RightClick, onClick)
+	// bg.SetCallback(ui.RightClick, onClick)
+
+	onRightClick := func(b *ui.Box) {
+		log.Printf("%s %s", b, "Box clicked!!!!!")
+	}
+	bg.SetCallback(ui.RightClick, onRightClick)
+	fmt.Println(reflect.TypeOf(onRightClick))
+
 	bg.SetCallback(ui.RightDoubleClick, onDoubleClick)
 	bg.Add(300, 200, ui.NewBox(200, 200, color.Black))
 

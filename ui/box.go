@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"image"
 	"image/color"
+	"log"
+	"reflect"
 
 	"github.com/hajimehoshi/ebiten"
 )
@@ -132,11 +134,20 @@ func (b *Box) String() string {
 	return fmt.Sprintf("Box[%s]%s%s", p, b.Rect, ColorCode(b.Color))
 }
 
+type CallBackToItem func(i Item)
+type CallBackToBox func(b *Box)
+
 // Call callback function if it exists
 func (b *Box) Call(t EventType) {
-	// log.Printf("%s %s", b.Sub, t)
+	log.Printf("%s %s", b.Sub, t)
 	if c, ok := b.Callbacks[t]; ok {
-		c(b.Sub)
+		fmt.Println(reflect.TypeOf(c))
+		switch cb := c.(type) {
+		case CallBackToBox:
+			cb(b)
+		case CallBackToItem:
+			cb(b.Sub)
+		}
 	}
 }
 
