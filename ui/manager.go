@@ -25,8 +25,7 @@ func init() {
 			DoubleClickInterval: 15,
 		},
 		KeyManager{
-			Pressed:        map[ebiten.Key]byte{},
-			Callbacks:      map[ebiten.Key]KeyCallback{},
+			Status:         map[ebiten.Key]*KeyStatus{},
 			RepeatInterval: 15,
 		},
 		FontManager{

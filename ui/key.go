@@ -7,24 +7,28 @@ import (
 // KeyCallback is callback for key
 type KeyCallback func()
 
+// KeyStatus is status of key
+type KeyStatus struct {
+	Pressed  byte
+	Callback KeyCallback
+}
+
 // KeyManager manage status of key
 type KeyManager struct {
-	Pressed        map[ebiten.Key]byte
-	Callbacks      map[ebiten.Key]KeyCallback
+	Status         map[ebiten.Key]*KeyStatus
 	RepeatInterval int
 }
 
 // KeyEvent call event
 func (k *KeyManager) KeyEvent() {
-	for key, b := range k.Pressed {
+	for key, s := range k.Status {
 		var pressed byte
 		if ebiten.IsKeyPressed(key) {
 			pressed = 1
 		}
-		b = b<<1 | pressed
-		k.Pressed[key] = b
-		if b&3 == 1 {
-			k.Callbacks[key]()
+		s.Pressed = s.Pressed<<1 | pressed
+		if s.Pressed&3 == 1 {
+			s.Callback()
 		}
 	}
 }
@@ -33,12 +37,12 @@ func (k *KeyManager) KeyEvent() {
 func SetCallback(key ebiten.Key, cb KeyCallback) {
 	k := m.KeyManager
 	if cb == nil {
-		delete(k.Pressed, key)
-		delete(k.Callbacks, key)
+		delete(k.Status, key)
 		return
 	}
-	if _, ok := k.Pressed[key]; !ok {
-		k.Pressed[key] = 0
+	if s, ok := k.Status[key]; ok {
+		s.Callback = cb
+	} else {
+		k.Status[key] = &KeyStatus{0, cb}
 	}
-	k.Callbacks[key] = cb
 }
