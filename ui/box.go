@@ -14,11 +14,11 @@ type Box struct {
 	Color            color.Color
 	Image            *ebiten.Image
 	DrawImageOptions *ebiten.DrawImageOptions
-	Dirty            bool
 	Parent           Item
 	Children         []Item
-	Callbacks
-	Sub Item
+	Callbacks        Callbacks
+	Sub              Item
+	dirty            bool
 }
 
 // NewBox make new Box
@@ -27,12 +27,12 @@ func NewBox(w, h int, c color.Color) *Box {
 		Rect:             image.Rect(0, 0, w, h),
 		Color:            c,
 		Image:            nil,
-		Dirty:            true,
 		DrawImageOptions: nil,
 		Parent:           nil,
 		Children:         []Item{},
 		Callbacks:        Callbacks{},
 		Sub:              nil,
+		dirty:            true,
 	}
 	b.Sub = b
 	return b
@@ -47,14 +47,14 @@ func (b *Box) Reflesh() {
 	}
 }
 
-// SetDirty set dirty
-func (b *Box) SetDirty() {
-	if b.Dirty == true {
+// Dirty set item dirty
+func (b *Box) Dirty() {
+	if b.dirty == true {
 		return
 	}
-	b.Dirty = true
+	b.dirty = true
 	if b.Parent != nil {
-		b.Parent.SetDirty()
+		b.Parent.Dirty()
 	}
 }
 
@@ -74,7 +74,7 @@ func (b *Box) SetParent(i Item) {
 func (b *Box) Move(x, y int) {
 	w, h := b.Size()
 	b.Rect = image.Rect(x, y, x+w, y+h)
-	b.Parent.SetDirty()
+	b.Parent.Dirty()
 }
 
 // Position return relative position from parent Item
@@ -87,7 +87,7 @@ func (b *Box) Position() (x, y int) {
 func (b *Box) Resize(w, h int) {
 	x, y := b.Rect.Min.X, b.Rect.Min.Y
 	b.Rect = image.Rect(x, y, x+w, y+h)
-	b.SetDirty()
+	b.Dirty()
 }
 
 // Size get size of item
@@ -108,10 +108,10 @@ func copyDrawImageOptions(op ebiten.DrawImageOptions) ebiten.DrawImageOptions {
 }
 
 // Draw draw box
-func (b *Box) Draw(screen *ebiten.Image) {
-	if b.Dirty {
+func (b *Box) Draw(target *ebiten.Image) {
+	if b.dirty {
 		b.Sub.Reflesh()
-		b.Dirty = false
+		b.dirty = false
 		for _, c := range b.Children {
 			c.Draw(b.Image)
 		}
@@ -123,7 +123,7 @@ func (b *Box) Draw(screen *ebiten.Image) {
 	}
 	x, y := b.Position()
 	op.GeoM.Translate(float64(x), float64(y))
-	screen.DrawImage(b.Image, op)
+	target.DrawImage(b.Image, op)
 }
 
 // String for fmt.Stringer

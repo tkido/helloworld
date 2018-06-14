@@ -27,7 +27,7 @@ type Label struct {
 // SetText set internal text string
 func (l *Label) SetText(s string) {
 	l.Text = s
-	l.SetDirty()
+	l.Dirty()
 }
 
 // GetText get internal text string

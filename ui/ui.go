@@ -36,6 +36,6 @@ func Update(bg Item) {
 }
 
 // Draw ui
-func Draw(screen *ebiten.Image, bg Item) {
-	bg.Draw(screen)
+func Draw(target *ebiten.Image, bg Item) {
+	bg.Draw(target)
 }

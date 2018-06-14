@@ -11,7 +11,7 @@ type Item interface {
 	Call(EventType)
 	Draw(screen *ebiten.Image)
 	Reflesh()
-	SetDirty()
+	Dirty()
 	Move(x, y int)
 	Position() (x, y int)
 	Resize(w, h int)
