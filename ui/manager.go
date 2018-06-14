@@ -10,6 +10,7 @@ import (
 type Manager struct {
 	Now int
 	MouseManager
+	KeyManager
 }
 
 var m *Manager
@@ -22,6 +23,11 @@ func init() {
 			Clicked:             [3]*MouseRecord{},
 			InItems:             map[Item]int{},
 			DoubleClickInterval: 15,
+		},
+		KeyManager{
+			Pressed:        map[ebiten.Key]byte{},
+			Callbacks:      map[ebiten.Key]KeyCallback{},
+			RepeatInterval: 15,
 		},
 	}
 }

@@ -32,13 +32,12 @@ type Game struct {
 func init() {
 	game = Game{false}
 	bg = mouseScreen()
+	ui.SetCallback(ebiten.KeyF4, func() {
+		game.IsDebugPrint = !game.IsDebugPrint
+	})
 }
 
 func control(screen *ebiten.Image) (err error) {
-	if ebiten.IsKeyPressed(ebiten.KeyF4) {
-		game.IsDebugPrint = !game.IsDebugPrint
-	}
-
 	ui.Update(bg)
 	return
 }

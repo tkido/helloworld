@@ -10,6 +10,7 @@ import (
 // Update ui
 func Update(bg Item) {
 	m.Now++
+	m.KeyManager.KeyEvent()
 	// mouse control
 	if ev, ok := m.getMouseEvent(); ok {
 		if handled := bg.HandleMouseEvent(ev, image.ZP, image.Rect(0, 0, math.MaxInt64, math.MaxInt32)); !handled {
@@ -38,4 +39,18 @@ func Update(bg Item) {
 // Draw ui
 func Draw(target *ebiten.Image, bg Item) {
 	bg.Draw(target)
+}
+
+// SetCallback set callback function for key. set nil means delete.
+func SetCallback(key ebiten.Key, cb KeyCallback) {
+	k := m.KeyManager
+	if cb == nil {
+		delete(k.Pressed, key)
+		delete(k.Callbacks, key)
+		return
+	}
+	if _, ok := k.Pressed[key]; !ok {
+		k.Pressed[key] = 0
+	}
+	k.Callbacks[key] = cb
 }
