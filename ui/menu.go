@@ -7,6 +7,10 @@ type Menu struct {
 	Choiced
 }
 
+type Choicer interface {
+	Choiced(c Choiced)
+}
+
 type Choice interface{}
 type Choices []Choice
 type Choiced func(c Choice)
