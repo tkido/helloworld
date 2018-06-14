@@ -16,9 +16,9 @@ type Box struct {
 	DrawImageOptions *ebiten.DrawImageOptions
 	Parent           Item
 	Children         []Item
-	Callbacks        Callbacks
 	Sub              Item
 	dirty            bool
+	Callbacks
 }
 
 // NewBox make new Box
