@@ -6,22 +6,17 @@ import (
 
 	"bitbucket.org/tkido/helloworld/ui"
 	"github.com/hajimehoshi/ebiten"
-	"golang.org/x/image/font"
 )
 
 const (
 	screenWidth  = 640
 	screenHeight = 480
-
-	dpi      = 72
-	fontSize = 24
 )
 
 var (
-	game       Game
-	bg         *ui.Box
-	normalFont font.Face
-	count      int
+	game  Game
+	bg    *ui.Box
+	count int
 )
 
 // Game is status of game

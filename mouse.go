@@ -3,13 +3,10 @@ package main
 import (
 	"image"
 	"image/color"
-	"io/ioutil"
 	"log"
 
 	"bitbucket.org/tkido/helloworld/ui"
-	"github.com/golang/freetype/truetype"
 	"github.com/hajimehoshi/ebiten"
-	"golang.org/x/image/font"
 )
 
 func onClick(i ui.Item) {
@@ -53,26 +50,6 @@ func mouseScreen() *ui.Box {
 	if err != nil {
 		log.Fatal(err)
 	}
-	// fonts
-	ttf, err := Assets.Open("/assets/PixelMplus12-Regular.ttf")
-	if err != nil {
-		log.Fatal(err)
-	}
-	defer ttf.Close()
-	bs, err := ioutil.ReadAll(ttf)
-	if err != nil {
-		log.Fatal(err)
-	}
-	tt, err := truetype.Parse(bs)
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	normalFont = truetype.NewFace(tt, &truetype.Options{
-		Size:    fontSize,
-		DPI:     dpi,
-		Hinting: font.HintingFull,
-	})
 
 	bg = ui.NewBox(screenWidth, screenHeight, color.NRGBA{0x00, 0xff, 0x00, 0xff})
 
@@ -103,8 +80,8 @@ func mouseScreen() *ui.Box {
 
 	box1.Add(-10, 120, img)
 
-	label := ui.NewLabel(screenWidth, 30, ".fjあいうアイウ愛飢男■★◆Ａｊｆ", normalFont, color.White, color.Black, 24)
-	label2 := ui.NewLabel(screenWidth, 30, ".fjあいうアイウ愛飢男■★◆Ａｊｆ", normalFont, color.White, color.Black, 24)
+	label := ui.NewLabel(screenWidth, 30, ".fjあいうアイウ愛飢男■★◆Ａｊｆ", 0, color.White, color.Black)
+	label2 := ui.NewLabel(screenWidth, 30, ".fjあいうアイウ愛飢男■★◆Ａｊｆ", 0, color.White, color.Black)
 	// label.SetCallback(ui.MouseOn, onMouseOn)
 	// label.SetCallback(ui.MouseIn, onMouseIn)
 	label.SetCallback(ui.MouseOut, onMouseOut)
