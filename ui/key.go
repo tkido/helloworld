@@ -24,9 +24,21 @@ func (k *KeyManager) KeyEvent() {
 		b = b<<1 | pressed
 		k.Pressed[key] = b
 		if b&3 == 1 {
-			if cb, ok := k.Callbacks[key]; ok {
-				cb()
-			}
+			k.Callbacks[key]()
 		}
 	}
+}
+
+// SetCallback set callback function for key. set nil means delete.
+func SetCallback(key ebiten.Key, cb KeyCallback) {
+	k := m.KeyManager
+	if cb == nil {
+		delete(k.Pressed, key)
+		delete(k.Callbacks, key)
+		return
+	}
+	if _, ok := k.Pressed[key]; !ok {
+		k.Pressed[key] = 0
+	}
+	k.Callbacks[key] = cb
 }
