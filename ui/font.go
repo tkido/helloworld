@@ -1,23 +1,23 @@
 package ui
 
 import (
-	"log"
-
 	"golang.org/x/image/font"
 )
 
+// Font is data of font
+type Font struct {
+	Face   font.Face
+	Ascent int
+}
+
 // FontManager manage font
 type FontManager struct {
-	Fonts   []font.Face
-	Ascents []int
+	Fonts []Font
 }
 
 // AddFont add font face
 func AddFont(face font.Face) {
-	m.FontManager.Fonts = append(m.FontManager.Fonts, face)
-	ascent := face.Metrics().Ascent.Floor()
-	log.Printf("%#v", face.Metrics().Ascent.Ceil())
-	log.Printf("%#v", face.Metrics().Descent.Ceil())
-	log.Printf("%#v", face.Metrics().Height.Ceil())
-	m.FontManager.Ascents = append(m.FontManager.Ascents, ascent)
+	ascent := face.Metrics().Ascent.Ceil()
+	data := Font{face, ascent}
+	m.FontManager.Fonts = append(m.FontManager.Fonts, data)
 }

@@ -2,7 +2,6 @@ package ui
 
 import (
 	"github.com/hajimehoshi/ebiten"
-	"golang.org/x/image/font"
 )
 
 // Manager is manager of internal status of ui
@@ -29,7 +28,7 @@ func init() {
 			RepeatInterval: 15,
 		},
 		FontManager{
-			Fonts: []font.Face{},
+			Fonts: []Font{},
 		},
 	}
 }

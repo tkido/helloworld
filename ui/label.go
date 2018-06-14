@@ -43,13 +43,12 @@ func NewLabel(w, h int, text string, font int, color, bgColor color.Color) *Labe
 // Reflesh updates internal *ebiten.Image
 func (l *Label) Reflesh() {
 	l.Box.Reflesh()
-	face := m.FontManager.Fonts[l.FontType]
-	ascent := m.FontManager.Ascents[l.FontType]
-	text.Draw(l.Image, l.Text, face, 0, ascent, l.FontColor)
+	f := m.FontManager.Fonts[l.FontType]
+	text.Draw(l.Image, l.Text, f.Face, 0, f.Ascent, l.FontColor)
 }
 
 // String for fmt.Stringer interface
 func (l *Label) String() string {
 	p := fmt.Sprintf("%p", l)[7:11]
-	return fmt.Sprintf("Label[%s]%s:%s", p, l.Rect, l.Text)
+	return fmt.Sprintf("Label[%s]%s:%s", p, l.Rect, l.Text[:4])
 }
