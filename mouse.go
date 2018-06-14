@@ -80,8 +80,8 @@ func mouseScreen() *ui.Box {
 
 	box1.Add(-10, 120, img)
 
-	label := ui.NewLabel(screenWidth, 30, ".fjあいうアイウ愛飢男■★◆Ａｊｆ", 0, color.White, color.Black)
-	label2 := ui.NewLabel(screenWidth, 30, ".fjあいうアイウ愛飢男■★◆Ａｊｆ", 0, color.White, color.Black)
+	label := ui.NewLabel(screenWidth, 30, "abcdefj", 0, color.White, color.Black)
+	label2 := ui.NewLabel(screenWidth, 30, "テストですよ。", 0, color.White, color.Black)
 	// label.SetCallback(ui.MouseOn, onMouseOn)
 	// label.SetCallback(ui.MouseIn, onMouseIn)
 	label.SetCallback(ui.MouseOut, onMouseOut)
