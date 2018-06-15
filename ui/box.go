@@ -10,29 +10,31 @@ import (
 
 // Box is simple box
 type Box struct {
-	Rect             image.Rectangle
-	Color            color.Color
-	Image            *ebiten.Image
-	DrawImageOptions *ebiten.DrawImageOptions
-	Parent           Item
-	Children         []Item
-	Sub              Item
-	dirty            bool
+	Rect     image.Rectangle
+	Color    color.Color
+	Image    *ebiten.Image
+	rawDio   ebiten.DrawImageOptions
+	dio      ebiten.DrawImageOptions
+	Parent   Item
+	Children []Item
+	Sub      Item
+	dirty    bool
 	Callbacks
 }
 
 // NewBox make new Box
 func NewBox(w, h int, c color.Color) *Box {
 	b := &Box{
-		Rect:             image.Rect(0, 0, w, h),
-		Color:            c,
-		Image:            nil,
-		DrawImageOptions: nil,
-		Parent:           nil,
-		Children:         []Item{},
-		Callbacks:        Callbacks{},
-		Sub:              nil,
-		dirty:            true,
+		Rect:      image.Rect(0, 0, w, h),
+		Color:     c,
+		Image:     nil,
+		rawDio:    ebiten.DrawImageOptions{},
+		dio:       ebiten.DrawImageOptions{},
+		Parent:    nil,
+		Children:  []Item{},
+		Callbacks: Callbacks{},
+		Sub:       nil,
+		dirty:     true,
 	}
 	b.Sub = b
 	return b
@@ -74,9 +76,7 @@ func (b *Box) SetParent(i Item) {
 func (b *Box) Move(x, y int) {
 	w, h := b.Size()
 	b.Rect = image.Rect(x, y, x+w, y+h)
-	if b.Parent != nil {
-		b.Parent.Dirty()
-	}
+	b.Dirty()
 }
 
 // Position return relative position from parent Item
@@ -98,34 +98,25 @@ func (b *Box) Size() (w, h int) {
 	return s.X, s.Y
 }
 
-func copyDrawImageOptions(op ebiten.DrawImageOptions) ebiten.DrawImageOptions {
-	if op.SourceRect != nil {
-		// log.Printf("%p", op.SourceRect)
-		sourceRect := *op.SourceRect
-		op.SourceRect = &sourceRect
-		// log.Printf("%p", op.SourceRect)
-		// log.Printf("ok?")
-	}
-	return op
-}
-
 // Draw draw box
 func (b *Box) Draw(target *ebiten.Image) {
 	if b.dirty {
-		b.Sub.Reflesh()
 		b.dirty = false
+		b.Sub.Reflesh()
+		b.dio = b.rawDio
+		x, y := b.Position()
+		b.dio.GeoM.Translate(float64(x), float64(y))
 		for _, c := range b.Children {
 			c.Draw(b.Image)
 		}
 	}
-	op := &ebiten.DrawImageOptions{}
-	if o := b.DrawImageOptions; o != nil {
-		copied := copyDrawImageOptions(*o)
-		op = &copied
-	}
-	x, y := b.Position()
-	op.GeoM.Translate(float64(x), float64(y))
-	target.DrawImage(b.Image, op)
+	target.DrawImage(b.Image, &b.dio)
+}
+
+// SetDIO returns DrawImageOptions
+func (b *Box) SetDIO(op ebiten.DrawImageOptions) {
+	b.rawDio = op
+	b.Dirty()
 }
 
 // String for fmt.Stringer
