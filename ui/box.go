@@ -74,7 +74,9 @@ func (b *Box) SetParent(i Item) {
 func (b *Box) Move(x, y int) {
 	w, h := b.Size()
 	b.Rect = image.Rect(x, y, x+w, y+h)
-	b.Parent.Dirty()
+	if b.Parent != nil {
+		b.Parent.Dirty()
+	}
 }
 
 // Position return relative position from parent Item

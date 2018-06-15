@@ -33,6 +33,5 @@ func menuScreen() *ui.Box {
 		})
 		menu.Add(0, i*30, label)
 	}
-
 	return bg
 }
