@@ -13,8 +13,8 @@ type Box struct {
 	Rect     image.Rectangle
 	Color    color.Color
 	Image    *ebiten.Image
-	rawDio   ebiten.DrawImageOptions
-	dio      ebiten.DrawImageOptions
+	rawDio   *ebiten.DrawImageOptions
+	dio      *ebiten.DrawImageOptions
 	Parent   Item
 	Children []Item
 	Sub      Item
@@ -28,8 +28,8 @@ func NewBox(w, h int, c color.Color) *Box {
 		Rect:      image.Rect(0, 0, w, h),
 		Color:     c,
 		Image:     nil,
-		rawDio:    ebiten.DrawImageOptions{},
-		dio:       ebiten.DrawImageOptions{},
+		rawDio:    &ebiten.DrawImageOptions{},
+		dio:       &ebiten.DrawImageOptions{},
 		Parent:    nil,
 		Children:  []Item{},
 		Callbacks: Callbacks{},
@@ -103,18 +103,21 @@ func (b *Box) Draw(target *ebiten.Image) {
 	if b.dirty {
 		b.dirty = false
 		b.Sub.Reflesh()
-		b.dio = b.rawDio
+		*(b.dio) = *(b.rawDio)
 		x, y := b.Position()
 		b.dio.GeoM.Translate(float64(x), float64(y))
 		for _, c := range b.Children {
 			c.Draw(b.Image)
 		}
 	}
-	target.DrawImage(b.Image, &b.dio)
+	target.DrawImage(b.Image, b.dio)
 }
 
 // SetDIO returns DrawImageOptions
-func (b *Box) SetDIO(op ebiten.DrawImageOptions) {
+func (b *Box) SetDIO(op *ebiten.DrawImageOptions) {
+	if op == nil {
+		op = &ebiten.DrawImageOptions{}
+	}
 	b.rawDio = op
 	b.Dirty()
 }

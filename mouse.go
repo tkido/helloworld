@@ -58,7 +58,7 @@ func mouseScreen() *ui.Box {
 	bg.Add(300, 200, ui.NewBox(200, 200, color.Black))
 
 	box1 := ui.NewBox(200, 200, color.NRGBA{0x00, 0xff, 0xff, 0xff})
-	op := ebiten.DrawImageOptions{}
+	op := &ebiten.DrawImageOptions{}
 	// op.GeoM.Scale(2.0, 2.0)
 	// op.ColorM.RotateHue(math.Pi)
 	// w, h := box1.Size()

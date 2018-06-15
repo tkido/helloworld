@@ -20,5 +20,5 @@ type Item interface {
 	HandleMouseEvent(ev MouseEvent, origin image.Point, clip image.Rectangle) (handled bool)
 	String() string
 	SetParent(i Item)
-	SetDIO(op ebiten.DrawImageOptions)
+	SetDIO(op *ebiten.DrawImageOptions)
 }

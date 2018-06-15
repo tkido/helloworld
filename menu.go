@@ -26,14 +26,14 @@ func menuScreen() *ui.Box {
 		}(i)
 		label.SetCallback(ui.LeftClick, onSelect)
 		label.SetCallback(ui.MouseOver, func(item ui.Item) {
-			op := ebiten.DrawImageOptions{}
+			op := &ebiten.DrawImageOptions{}
 			op.GeoM.Translate(20, 0)
 			item.SetDIO(op)
 			// x, y := item.Position()
 			// item.Move(x+20, y)
 		})
 		label.SetCallback(ui.MouseOut, func(item ui.Item) {
-			item.SetDIO(ebiten.DrawImageOptions{})
+			item.SetDIO(nil)
 			// x, y := item.Position()
 			// item.Move(x-20, y)
 		})
