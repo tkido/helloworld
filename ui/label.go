@@ -4,8 +4,6 @@ import (
 	"fmt"
 	"image/color"
 
-	"golang.org/x/image/font"
-
 	"github.com/hajimehoshi/ebiten/text"
 )
 
@@ -19,15 +17,14 @@ type Texter interface {
 type Label struct {
 	Box
 	Text      string
-	Face      font.Face
+	FontType  int
 	FontColor color.Color
-	FontSize  int
 }
 
 // SetText set internal text string
 func (l *Label) SetText(s string) {
 	l.Text = s
-	l.SetDirty()
+	l.Dirty()
 }
 
 // GetText get internal text string
@@ -36,9 +33,9 @@ func (l *Label) GetText() string {
 }
 
 // NewLabel make new *ui.Label
-func NewLabel(w, h int, text string, face font.Face, color, bgColor color.Color, s int) *Label {
+func NewLabel(w, h int, text string, font int, color, bgColor color.Color) *Label {
 	b := NewBox(w, h, bgColor)
-	l := &Label{*b, text, face, color, s}
+	l := &Label{*b, text, font, color}
 	l.Sub = l
 	return l
 }
@@ -46,21 +43,12 @@ func NewLabel(w, h int, text string, face font.Face, color, bgColor color.Color,
 // Reflesh updates internal *ebiten.Image
 func (l *Label) Reflesh() {
 	l.Box.Reflesh()
-	// _, h := l.Size()
-	rect, advance := font.BoundString(l.Face, l.Text)
-	fmt.Println(l.Face.GlyphBounds('.'))
-	fmt.Println(rect)
-	fmt.Println(advance)
-
-	text.Draw(l.Image, l.Text, l.Face, 0, l.FontSize, l.FontColor)
-	// for _, r := range l.Text {
-	// 	s := fmt.Sprint(l.Face.GlyphBounds(r))
-	// 	fmt.Printf("%s:%s\n", string(r), s)
-	// }
+	f := m.FontManager.Fonts[l.FontType]
+	text.Draw(l.Image, l.Text, f.Face, 0, f.Ascent, l.FontColor)
 }
 
 // String for fmt.Stringer interface
 func (l *Label) String() string {
 	p := fmt.Sprintf("%p", l)[7:11]
-	return fmt.Sprintf("Label[%s]%s:%s", p, l.Rect, l.Text)
+	return fmt.Sprintf("Label[%s]%s:%s", p, l.Rect, string([]rune(l.Text)[:4]))
 }

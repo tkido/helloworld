@@ -10,6 +10,7 @@ import (
 // Update ui
 func Update(bg Item) {
 	m.Now++
+	m.KeyManager.KeyEvent()
 	// mouse control
 	if ev, ok := m.getMouseEvent(); ok {
 		if handled := bg.HandleMouseEvent(ev, image.ZP, image.Rect(0, 0, math.MaxInt64, math.MaxInt32)); !handled {
@@ -36,6 +37,6 @@ func Update(bg Item) {
 }
 
 // Draw ui
-func Draw(screen *ebiten.Image, bg Item) {
-	bg.Draw(screen)
+func Draw(target *ebiten.Image, bg Item) {
+	bg.Draw(target)
 }
