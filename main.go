@@ -26,7 +26,7 @@ type Game struct {
 
 func init() {
 	game = Game{false}
-	bg = mouseScreen()
+	bg = menuScreen()
 	ui.SetCallback(ebiten.KeyF4, func() {
 		game.IsDebugPrint = !game.IsDebugPrint
 	})
