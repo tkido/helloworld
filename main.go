@@ -30,6 +30,10 @@ func init() {
 	ui.SetCallback(ebiten.KeyF4, func() {
 		game.IsDebugPrint = !game.IsDebugPrint
 	})
+	ui.SetCallback(ebiten.KeyF5, func() {
+		ebiten.SetScreenScale(2)
+	})
+
 }
 
 func control(screen *ebiten.Image) (err error) {
