@@ -8,6 +8,9 @@ import (
 
 // Item is ebiten UI item
 type Item interface {
+	Show()
+	Hide()
+	IsVisible() bool
 	Call(EventType)
 	Draw(screen *ebiten.Image)
 	Reflesh()

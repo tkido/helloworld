@@ -19,6 +19,7 @@ type Box struct {
 	Children []Item
 	Sub      Item
 	dirty    bool
+	visible  bool
 	Callbacks
 }
 
@@ -35,9 +36,24 @@ func NewBox(w, h int, c color.Color) *Box {
 		Callbacks: Callbacks{},
 		Sub:       nil,
 		dirty:     true,
+		visible:   true,
 	}
 	b.Sub = b
 	return b
+}
+
+func (b *Box) Show() {
+	b.visible = true
+	if b.Parent != nil {
+		b.Parent.Dirty()
+	}
+}
+func (b *Box) Hide() {
+	b.visible = false
+	b.Dirty()
+}
+func (b *Box) IsVisible() bool {
+	return b.visible
 }
 
 // Reflesh updates internal *ebiten.Image
@@ -100,6 +116,9 @@ func (b *Box) Size() (w, h int) {
 
 // Draw draw box
 func (b *Box) Draw(target *ebiten.Image) {
+	if !b.visible {
+		return
+	}
 	if b.dirty {
 		b.dirty = false
 		b.Sub.Reflesh()

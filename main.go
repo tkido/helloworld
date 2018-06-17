@@ -1,6 +1,7 @@
 package main
 
 import (
+	"image/color"
 	_ "image/png"
 	"log"
 
@@ -26,14 +27,17 @@ type Game struct {
 
 func init() {
 	game = Game{false}
-	bg = menuScreen()
+	bg = ui.NewBox(screenWidth, screenHeight, color.NRGBA{0x00, 0xff, 0x00, 0xff})
+	menu := menuScreen()
+	mainMenu := mainMenu()
+	bg.Add(0, 0, mainMenu)
+	bg.Add(0, 30, menu)
 	ui.SetCallback(ebiten.KeyF4, func() {
 		game.IsDebugPrint = !game.IsDebugPrint
 	})
 	ui.SetCallback(ebiten.KeyF5, func() {
 		ebiten.SetScreenScale(2)
 	})
-
 }
 
 func control(screen *ebiten.Image) (err error) {
