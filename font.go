@@ -10,14 +10,9 @@ import (
 	"golang.org/x/image/font"
 )
 
-const (
-	dpi      = 72
-	fontSize = 24
-)
-
 func init() {
-	addFont("/assets/PixelMplus12-Regular.ttf", 24, 72, font.HintingFull)
 	addFont("/assets/mplus-1p-regular.ttf", 24, 72, font.HintingFull)
+	addFont("/assets/PixelMplus12-Regular.ttf", 24, 72, font.HintingFull)
 }
 
 func addFont(path string, size, DPI float64, hinting font.Hinting) {
