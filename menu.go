@@ -24,16 +24,11 @@ func menuScreen() *ui.Box {
 
 	data := []string{"バナナ", "りんご", "オレンジ", "とうもろこし", "焼き肉", "北京ダック", "豚の丸焼き"}
 	bg = ui.NewBox(screenWidth, screenHeight, color.NRGBA{0x00, 0xff, 0x00, 0xff})
-	menu := ui.NewNinepatch(400, 400, png)
+	menu := ui.NewNinepatch(400, 400, png, image.Rect(8, 8, 24, 24))
 	bg.Add(10, 10, menu)
 
 	result := ui.NewLabel(240, 30, "", 0, color.White, color.Black)
 	bg.Add(420, 420, result)
-
-	img := ui.NewImage(32, 32, png)
-	nine := ui.NewNinepatch(128, 128, png)
-	bg.Add(440, 100, img)
-	bg.Add(440, 150, nine)
 
 	for i, s := range data {
 		label := ui.NewLabel(400, 30, s, 0, color.NRGBA{0x00, 0xff, 0x00, 0xff}, nil)

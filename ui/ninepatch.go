@@ -15,9 +15,9 @@ type Ninepatch struct {
 }
 
 // NewNinepatch make new *ui.Ninepatch
-func NewNinepatch(w, h int, srcImg image.Image) *Ninepatch {
+func NewNinepatch(w, h int, srcImg image.Image, contentArea image.Rectangle) *Ninepatch {
 	b := NewBox(w, h, nil)
-	n := &Ninepatch{*b, srcImg, image.Rect(8, 8, 24, 24)}
+	n := &Ninepatch{*b, srcImg, contentArea}
 	n.Sub = n
 	return n
 }
@@ -42,7 +42,7 @@ func (n *Ninepatch) Reflesh() {
 	so, si := src.Bounds(), n.ContentArea
 	s := makeNineRects(so, si)
 	to := n.Image.Bounds()
-	tiSize := image.Point{to.Dx() - s[0].Dx() - s[2].Dx(), to.Dy() - s[0].Dy() - s[6].Dy()}
+	tiSize := image.Point{to.Dx() - so.Dx() + si.Dx(), to.Dy() - so.Dy() + si.Dy()}
 	ti := image.Rectangle{si.Min, si.Min.Add(tiSize)}
 	t := makeNineRects(to, ti)
 	for i := 0; i < 9; i++ {
@@ -57,5 +57,5 @@ func (n *Ninepatch) Reflesh() {
 // String for fmt.Stringer interface
 func (n *Ninepatch) String() string {
 	p := fmt.Sprintf("%p", n)[7:11]
-	return fmt.Sprintf("Image[%s]%s", p, n.Box.Rect)
+	return fmt.Sprintf("Ninepatch[%s]%s", p, n.Box.Rect)
 }
