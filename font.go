@@ -16,7 +16,12 @@ const (
 )
 
 func init() {
-	ttf, err := Assets.Open("/assets/PixelMplus12-Regular.ttf")
+	addFont("/assets/PixelMplus12-Regular.ttf", 24, 72, font.HintingFull)
+	addFont("/assets/mplus-1p-regular.ttf", 24, 72, font.HintingFull)
+}
+
+func addFont(path string, size, DPI float64, hinting font.Hinting) {
+	ttf, err := Assets.Open(path)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -30,9 +35,9 @@ func init() {
 		log.Fatal(err)
 	}
 	face := truetype.NewFace(tt, &truetype.Options{
-		Size:    fontSize,
-		DPI:     dpi,
-		Hinting: font.HintingFull,
+		Size:    size,
+		DPI:     DPI,
+		Hinting: hinting,
 	})
 	ui.AddFont(face)
 }
