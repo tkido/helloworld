@@ -18,7 +18,7 @@ func mainMenu() *ui.Box {
 		menu.Show()
 	})
 	for i, s := range data {
-		label := ui.NewLabel(100, 30, s, 0, color.Black, nil)
+		label := ui.NewLabel(100, 30, s, 0, ui.Center, color.Black, nil)
 		label.SetCallback(ui.LeftClick, func(i int) func(item ui.Item) {
 			return func(item ui.Item) {
 				// result.SetText(data[i])

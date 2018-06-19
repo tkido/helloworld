@@ -27,11 +27,11 @@ func menuScreen() *ui.Box {
 	menu := ui.NewNinepatch(400, 400, png, image.Rect(8, 8, 24, 24))
 	screen.Add(10, 10, menu)
 
-	result := ui.NewLabel(240, 30, "", 0, color.White, color.Black)
+	result := ui.NewLabel(220, 30, "", 0, ui.Right, color.White, color.Black)
 	screen.Add(420, 420, result)
 
 	for i, s := range data {
-		label := ui.NewLabel(400, 30, s, 0, color.NRGBA{0x00, 0xff, 0x00, 0xff}, nil)
+		label := ui.NewLabel(320, 30, s, 0, ui.Left, color.NRGBA{0x00, 0xff, 0x00, 0xff}, nil)
 		label.SetCallback(ui.LeftClick, func(i int) func(item ui.Item) {
 			return func(item ui.Item) {
 				result.SetText(data[i])
