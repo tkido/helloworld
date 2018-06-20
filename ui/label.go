@@ -4,7 +4,21 @@ import (
 	"fmt"
 	"image/color"
 
+	"golang.org/x/image/font"
+
 	"github.com/hajimehoshi/ebiten/text"
+)
+
+// Align is align
+type Align int
+
+// Align
+const (
+	Left   Align = 0
+	Top    Align = 0
+	Right  Align = 1
+	Bottom Align = 1
+	Center Align = 2
 )
 
 // Texter has internal text as string
@@ -19,6 +33,7 @@ type Label struct {
 	Text      string
 	FontType  int
 	FontColor color.Color
+	Align
 }
 
 // SetText set internal text string
@@ -33,9 +48,9 @@ func (l *Label) GetText() string {
 }
 
 // NewLabel make new *ui.Label
-func NewLabel(w, h int, text string, font int, color, bgColor color.Color) *Label {
+func NewLabel(w, h int, text string, font int, align Align, color, bgColor color.Color) *Label {
 	b := NewBox(w, h, bgColor)
-	l := &Label{*b, text, font, color}
+	l := &Label{*b, text, font, color, align}
 	l.Sub = l
 	return l
 }
@@ -44,7 +59,19 @@ func NewLabel(w, h int, text string, font int, color, bgColor color.Color) *Labe
 func (l *Label) Reflesh() {
 	l.Box.Reflesh()
 	f := m.FontManager.Fonts[l.FontType]
-	text.Draw(l.Image, l.Text, f.Face, 0, f.Ascent, l.FontColor)
+
+	left := 0
+	w, _ := l.Size()
+	length := font.MeasureString(f.Face, l.Text).Ceil()
+
+	switch l.Align {
+	case Left:
+	case Right:
+		left = w - length
+	case Center:
+		left = (w - length) / 2
+	}
+	text.Draw(l.Image, l.Text, f.Face, left, f.Ascent, l.FontColor)
 }
 
 // String for fmt.Stringer interface

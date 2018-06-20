@@ -42,16 +42,21 @@ func NewBox(w, h int, c color.Color) *Box {
 	return b
 }
 
+// Show item
 func (b *Box) Show() {
 	b.visible = true
 	if b.Parent != nil {
 		b.Parent.Dirty()
 	}
 }
+
+// Hide item
 func (b *Box) Hide() {
 	b.visible = false
 	b.Dirty()
 }
+
+// IsVisible return visiblity
 func (b *Box) IsVisible() bool {
 	return b.visible
 }

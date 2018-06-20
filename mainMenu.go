@@ -9,7 +9,7 @@ import (
 
 func mainMenu() *ui.Box {
 	data := []string{"マウス", "キー", "メニュー", "ダイアログ"}
-	menu := ui.NewBox(640, 30, color.NRGBA{0xCC, 0xCC, 0xCC, 0xff})
+	menu := ui.NewBox(640, 15, color.NRGBA{0xCC, 0xCC, 0xCC, 0xff})
 	ui.SetCallback(ebiten.KeyEscape, func() {
 		if menu.IsVisible() {
 			menu.Hide()
@@ -18,7 +18,7 @@ func mainMenu() *ui.Box {
 		menu.Show()
 	})
 	for i, s := range data {
-		label := ui.NewLabel(100, 30, s, 1, color.Black, nil)
+		label := ui.NewLabel(100, 15, s, 1, ui.Center, color.Black, nil)
 		label.SetCallback(ui.LeftClick, func(i int) func(item ui.Item) {
 			return func(item ui.Item) {
 				// result.SetText(data[i])
