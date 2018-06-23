@@ -4,6 +4,7 @@ import (
 	"io/ioutil"
 	"log"
 
+	"bitbucket.org/tkido/helloworld/assets"
 	"bitbucket.org/tkido/helloworld/ui"
 
 	"github.com/golang/freetype/truetype"
@@ -11,13 +12,13 @@ import (
 )
 
 func init() {
-	addFont("/assets/mplus-1p-regular.ttf", 24, 72, font.HintingFull)
-	addFont("/assets/mplus-1p-bold.ttf", 12, 72, font.HintingFull)
-	addFont("/assets/PixelMplus12-Regular.ttf", 24, 72, font.HintingFull)
+	addFont("mplus-1p-regular.ttf", 24, 72, font.HintingFull)
+	addFont("mplus-1p-bold.ttf", 12, 72, font.HintingFull)
+	addFont("PixelMplus12-Regular.ttf", 24, 72, font.HintingFull)
 }
 
 func addFont(path string, size, dpi float64, hinting font.Hinting) {
-	ttf, err := Assets.Open(path)
+	ttf, err := assets.FileSystem.Open(path)
 	if err != nil {
 		log.Fatal(err)
 	}

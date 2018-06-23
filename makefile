@@ -20,9 +20,10 @@ deps:
 	$(GOGET) github.com/jessevdk/go-assets-builder
 	$(GOGET) golang.org/x/image/font
 asset:
-	go-assets-builder -p=main -o=assets.go assets/
-	go-assets-builder -p=main -o=$(PKG_LIFE)/assets.go -s=/$(PKG_LIFE) $(PKG_LIFE)/assets/
-	go-assets-builder -p=main -o=$(PKG_COLLISION)/assets.go -s=/$(PKG_COLLISION) $(PKG_COLLISION)/assets/
+	go-assets-builder -p=assets -o=assets/assets.go -v=FileSystem -s=/_assets/ _assets/
+	# go-assets-builder -p=main -o=assets.go assets/
+	# go-assets-builder -p=main -o=$(PKG_LIFE)/assets.go -s=/$(PKG_LIFE) $(PKG_LIFE)/assets/
+	# go-assets-builder -p=main -o=$(PKG_COLLISION)/assets.go -s=/$(PKG_COLLISION) $(PKG_COLLISION)/assets/
 test:
 	$(GOTEST) .
 	$(GOTEST) ./core/godfather

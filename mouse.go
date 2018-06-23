@@ -5,6 +5,7 @@ import (
 	"image/color"
 	"log"
 
+	"bitbucket.org/tkido/helloworld/assets"
 	"bitbucket.org/tkido/helloworld/ui"
 	"github.com/hajimehoshi/ebiten"
 )
@@ -41,7 +42,7 @@ func onMouseLeave(i ui.Item) {
 
 func mouseScreen() *ui.Box {
 	// images
-	f, err := Assets.Open("/assets/food_tenpura_ebiten.png")
+	f, err := assets.FileSystem.Open("/assets/food_tenpura_ebiten.png")
 	if err != nil {
 		log.Fatal(err)
 	}

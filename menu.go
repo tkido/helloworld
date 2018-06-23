@@ -7,12 +7,13 @@ import (
 
 	"github.com/hajimehoshi/ebiten"
 
+	"bitbucket.org/tkido/helloworld/assets"
 	"bitbucket.org/tkido/helloworld/ui"
 )
 
 func menuScreen() *ui.Box {
 	// images
-	f, err := Assets.Open("/assets/ninepatch.png")
+	f, err := assets.FileSystem.Open("ninepatch.png")
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -27,7 +28,7 @@ func menuScreen() *ui.Box {
 	menu := ui.NewNinepatch(400, 400, png, image.Rect(8, 8, 24, 24))
 	screen.Add(10, 10, menu)
 
-	result := ui.NewLabel(220, 30, "", 0, ui.Right, color.White, color.Black)
+	result := ui.NewLabel(220, 30, "", 0, ui.Center, color.White, color.Black)
 	screen.Add(420, 420, result)
 
 	for i, s := range data {
