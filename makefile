@@ -7,9 +7,6 @@ GOGET=$(GOCMD) get
 BINARY_NAME=mmm.exe
 BINARY_UNIX=$(BINARY_NAME)_unix
 
-PKG_LIFE=exsamples/life
-PKG_COLLISION=exsamples/collision
-
 all: test clean asset build
 run: clean build execute
 deps:
@@ -21,9 +18,6 @@ deps:
 	$(GOGET) golang.org/x/image/font
 asset:
 	go-assets-builder -p=assets -o=assets/assets.go -v=FileSystem -s=/_assets/ _assets/
-	# go-assets-builder -p=main -o=assets.go assets/
-	# go-assets-builder -p=main -o=$(PKG_LIFE)/assets.go -s=/$(PKG_LIFE) $(PKG_LIFE)/assets/
-	# go-assets-builder -p=main -o=$(PKG_COLLISION)/assets.go -s=/$(PKG_COLLISION) $(PKG_COLLISION)/assets/
 test:
 	$(GOTEST) .
 	$(GOTEST) ./core/godfather
