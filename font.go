@@ -18,7 +18,7 @@ func init() {
 }
 
 func addFont(path string, size, dpi float64, hinting font.Hinting) {
-	ttf, err := assets.FileSystem.Open(path)
+	ttf, err := assets.File.Open(path)
 	if err != nil {
 		log.Fatal(err)
 	}

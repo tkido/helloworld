@@ -17,7 +17,7 @@ deps:
 	$(GOGET) github.com/jessevdk/go-assets-builder
 	$(GOGET) golang.org/x/image/font
 asset:
-	go-assets-builder -p=assets -o=assets/assets.go -v=FileSystem -s=/_assets/ _assets/
+	go-assets-builder -p=assets -o=assets/assets.go -v=File -s=/_assets/ _assets/
 test:
 	$(GOTEST) .
 	$(GOTEST) ./core/godfather

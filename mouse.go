@@ -42,7 +42,7 @@ func onMouseLeave(i ui.Item) {
 
 func mouseScreen() *ui.Box {
 	// images
-	f, err := assets.FileSystem.Open("/assets/food_tenpura_ebiten.png")
+	f, err := assets.File.Open("/assets/food_tenpura_ebiten.png")
 	if err != nil {
 		log.Fatal(err)
 	}

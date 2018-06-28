@@ -13,7 +13,7 @@ import (
 
 func menuScreen() *ui.Box {
 	// images
-	f, err := assets.FileSystem.Open("ninepatch.png")
+	f, err := assets.File.Open("ninepatch.png")
 	if err != nil {
 		log.Fatal(err)
 	}
