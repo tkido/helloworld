@@ -9,7 +9,7 @@ import (
 
 func mainMenu() *ui.Box {
 	data := []string{"マウス", "キー", "メニュー", "ダイアログ"}
-	menu := ui.NewBox(640, 15, color.NRGBA{0xCC, 0xCC, 0xCC, 0xff})
+	menu := ui.NewBox(640, 15, ui.Color("ccc"))
 	ui.SetCallback(ebiten.KeyEscape, func() {
 		if menu.IsVisible() {
 			menu.Hide()

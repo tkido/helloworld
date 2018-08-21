@@ -2,39 +2,49 @@ package main
 
 import (
 	"bufio"
+	"fmt"
 	"log"
 	"os"
-	"time"
 )
 
 func main() {
-	log.Println("START")
-	loop()
-	log.Println("END")
-}
-
-func loop() {
-	s := bufio.NewScanner(os.Stdin)
-	for s.Scan() {
-		str := s.Text()
-		log.Print(str)
-		switch str {
-		case "exit":
-			log.Print("hogehoge")
-			break
+	g := NewGame()
+LOOP:
+	for {
+		switch g.Screen {
+		case Title:
+			g.title()
+		case Result:
+			g.result()
+		case Exit:
+			break LOOP
 		}
 	}
-	if s.Err() != nil {
-		log.Fatal(s.Err())
+}
+
+func (g *Game) title() {
+	fmt.Println("Vampire Hunter")
+	g.Name = getName()
+	g.Screen = Result
+}
+
+func (g *Game) result() {
+	msg := fmt.Sprintf("あなたの名前は%sです。", g.Name)
+	fmt.Println(msg)
+	g.Screen = Exit
+}
+
+func getName() string {
+	name := ""
+	for name == "" {
+		fmt.Println("名前を入力してください。")
+		s := bufio.NewScanner(os.Stdin)
+		if s.Scan() {
+			name = s.Text()
+		}
+		if s.Err() != nil {
+			log.Fatal(s.Err())
+		}
 	}
-}
-
-// Game is Game
-type Game struct {
-	Time time.Time
-}
-
-// NewGame is NewGame
-func NewGame() *Game {
-	return &Game{time.Now()}
+	return name
 }
