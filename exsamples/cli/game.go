@@ -1,25 +1,17 @@
 package main
 
+import "bitbucket.org/tkido/helloworld/core/scene"
+
 // Game is Game
 type Game struct {
-	Screen Screen
-	Name   string
+	Scene scene.Scene
+	Name  string
 }
 
 // NewGame is NewGame
 func NewGame() *Game {
 	return &Game{
-		Title,
+		scene.TITLE,
 		"",
 	}
 }
-
-// Screen is Screen
-type Screen int
-
-// Screen enum
-const (
-	Title = iota
-	Result
-	Exit
-)
