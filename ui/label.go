@@ -24,13 +24,13 @@ const (
 // Texter has internal text as string
 type Texter interface {
 	SetText(text string)
-	GetText() (text string)
+	Text() (text string)
 }
 
 // Label is simple box
 type Label struct {
 	Box
-	Text      string
+	RawText   string
 	FontType  int
 	FontColor color.Color
 	Align
@@ -38,13 +38,13 @@ type Label struct {
 
 // SetText set internal text string
 func (l *Label) SetText(s string) {
-	l.Text = s
+	l.RawText = s
 	l.Dirty()
 }
 
-// GetText get internal text string
-func (l *Label) GetText() string {
-	return l.Text
+// Text for Texter interface
+func (l *Label) Text() string {
+	return l.RawText
 }
 
 // NewLabel make new *ui.Label
@@ -62,7 +62,7 @@ func (l *Label) Reflesh() {
 
 	left := 0
 	w, _ := l.Size()
-	length := font.MeasureString(f.Face, l.Text).Ceil()
+	length := font.MeasureString(f.Face, l.RawText).Ceil()
 
 	switch l.Align {
 	case Left:
@@ -71,11 +71,11 @@ func (l *Label) Reflesh() {
 	case Center:
 		left = (w - length) / 2
 	}
-	text.Draw(l.Image, l.Text, f.Face, left, f.Ascent, l.FontColor)
+	text.Draw(l.Image, l.RawText, f.Face, left, f.Ascent, l.FontColor)
 }
 
 // String for fmt.Stringer interface
 func (l *Label) String() string {
 	p := fmt.Sprintf("%p", l)[7:11]
-	return fmt.Sprintf("Label[%s]%s:%s", p, l.Rect, string([]rune(l.Text)[:4]))
+	return fmt.Sprintf("Label[%s]%s:%s", p, l.Rect, string([]rune(l.RawText)[:4]))
 }

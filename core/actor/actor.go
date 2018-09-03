@@ -24,9 +24,8 @@ func (a *Actor) String() string {
 
 // Infect is Infect
 func (a *Actor) Infect() {
-	ini := a.Infection
-	for i := 0; i < ini; i++ {
-		if a.Infection < rand.Intn(100)+1 {
+	for i := 0; i < 5; i++ {
+		if a.Infection <= rand.Intn(100) {
 			a.Infection++
 		}
 	}

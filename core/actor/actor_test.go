@@ -10,7 +10,7 @@ import (
 func TestInfection(t *testing.T) {
 	rand.Seed(time.Now().UnixNano())
 
-	a := Actor{"アン", 1}
+	a := Actor{"アン", 0}
 	for i := 0; i < 20; i++ {
 		a.Infect()
 		fmt.Println(a)
