@@ -28,7 +28,7 @@ type Game struct {
 func init() {
 	game = Game{false}
 	bg = ui.NewBox(screenWidth, screenHeight, color.NRGBA{0x00, 0xff, 0x00, 0xff})
-	menu := bloodScreen()
+	menu := menuScreen()
 	mainMenu := mainMenu()
 	bg.Add(0, 0, mainMenu)
 	bg.Add(0, 0, menu)

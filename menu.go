@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"image"
 	"image/color"
 	"log"
@@ -35,7 +36,7 @@ func menuScreen() *ui.Box {
 		label := ui.NewLabel(400, 30, s, 0, ui.Left, ui.Color("0f0"), nil)
 		label.SetCallback(ui.LeftClick, func(i int) func(item ui.Item) {
 			return func(item ui.Item) {
-				result.SetText(data[i])
+				result.SetText(fmt.Sprintf("%d:%s", i, data[i]))
 			}
 		}(i))
 		label.SetCallback(ui.MouseOver, func(item ui.Item) {

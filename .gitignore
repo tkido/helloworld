@@ -22,8 +22,8 @@ _testmain.go
 *.exe
 *.test
 *.prof
-assets.go
 
 # Added
+assets.go
 src/debug.log
 conf.properties
